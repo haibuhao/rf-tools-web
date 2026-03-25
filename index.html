@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RF Tools & Formulas Web</title>
+    <meta
+      name="Antenna"
+      content="天线计算器。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Antenna Engineering Toolkit</p>
+          <h1>天线计算工具</h1>
+          <p class="lead">用于天线、OTA、匹配和射频链路分析的在线计算。</p>
+        </div>
+      </header>
+
+      <nav class="tabbar" aria-label="Content Tabs">
+        <button class="tab-button is-active" data-tab-target="calculators" type="button">
+          实用射频计算器
+        </button>
+        <button class="tab-button" data-tab-target="formulas" type="button">
+          常用公式库
+        </button>
+      </nav>
+
+      <main class="content-stack">
+        <section class="content-panel is-active" id="calculators">
+          <div class="section-intro">
+            <div>
+              <p class="section-kicker">Calculator Workspace</p>
+              <h2>实用射频计算器</h2>
+            </div>
+          </div>
+          <div class="cards-grid">
+            <section class="tool-card accent-blue">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 01</p>
+                <h2>频率与波长计算</h2>
+                <p>输入频率后自动换算全波长、半波长和四分之一波长。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>输入频率 (MHz)</span>
+                  <input class="calc-input" id="freqInput" type="text" value="2400" />
+                </label>
+                <label class="field">
+                  <span>全波长 λ (mm)</span>
+                  <input class="result-input" id="waveMm" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>全波长 λ (cm)</span>
+                  <input class="result-input" id="waveCm" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>半波长 λ/2 (mm)</span>
+                  <input class="result-input" id="halfWave" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>四分之一波长 λ/4 (mm)</span>
+                  <input class="result-input" id="quarterWave" type="text" readonly />
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-purple wide">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 02</p>
+                <h2>Band 频段查询</h2>
+                <p>支持 LTE / 5G NR，输入如 <code>38</code>、<code>b38</code>、<code>n78</code>、<code>Band 41</code>。</p>
+              </div>
+              <div class="field-grid band-layout">
+                <label class="field">
+                  <span>输入 Band 号</span>
+                  <input class="calc-input" id="bandInput" type="text" value="8" />
+                </label>
+                <label class="field field-wide">
+                  <span>频段信息</span>
+                  <textarea class="result-area" id="bandResult" readonly rows="3"></textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-red">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 03</p>
+                <h2>自由空间路径损耗</h2>
+                <p>按米和 MHz 计算 FSPL。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>测试距离 d (m)</span>
+                  <input class="calc-input" id="fsplDistance" type="text" value="1" />
+                </label>
+                <label class="field">
+                  <span>频率 f (MHz)</span>
+                  <input class="calc-input" id="fsplFreq" type="text" value="2400" />
+                </label>
+                <label class="field">
+                  <span>FSPL (dB)</span>
+                  <input class="result-input" id="fsplResult" type="text" readonly />
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-orange">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 04</p>
+                <h2>效率与 dB 换算</h2>
+                <p>按功率效率换算，50% 对应约 -3.01 dB。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>效率损耗 (dB)</span>
+                  <input class="calc-input" id="effDbInput" type="text" value="-3.01" />
+                </label>
+                <label class="field">
+                  <span>效率 (%)</span>
+                  <input class="calc-input" id="effPctInput" type="text" value="50" />
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-green">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 05</p>
+                <h2>dBm 与 Watt 转换</h2>
+                <p>双向换算功率单位，网页端按当前输入侧实时更新另一侧。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>功率 (dBm)</span>
+                  <input class="calc-input" id="dbmInput" type="text" value="30" />
+                </label>
+                <label class="field">
+                  <span>功率 (Watt)</span>
+                  <input class="calc-input" id="wattInput" type="text" value="1" />
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-cyan">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 06</p>
+                <h2>多天线合成增益</h2>
+                <p>输入多个天线增益，自动输出非相干和相干合成结果。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field field-wide">
+                  <span>各天线增益 (dBi，逗号分隔)</span>
+                  <input class="calc-input" id="arrayGains" type="text" value="5, 5, 5, 5" />
+                </label>
+                <label class="field">
+                  <span>非相干 (dBi)</span>
+                  <input class="result-input" id="arrayUncorr" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>相干 (dBi)</span>
+                  <input class="result-input" id="arrayCorr" type="text" readonly />
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-teal wide">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 07</p>
+                <h2>有源与无源指标等效预估</h2>
+                <p>按你当前桌面版逻辑，输入增益和效率，反推方向性，并联动计算 EIRP / TRP / EIS / TIS。</p>
+              </div>
+              <div class="cluster-grid">
+                <div class="cluster">
+                  <h3>[无源] 增益与方向性</h3>
+                  <div class="field-grid">
+                    <label class="field">
+                      <span>增益 (dBi)</span>
+                      <input class="calc-input" id="gainInput" type="text" value="2.0" />
+                    </label>
+                    <label class="field">
+                      <span>效率 (dB)</span>
+                      <input class="calc-input" id="effInput" type="text" value="-3.0" />
+                    </label>
+                    <label class="field">
+                      <span>方向性 (dBi)</span>
+                      <input class="result-input" id="directivityOutput" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <h3>[有源发射 TX]</h3>
+                  <div class="field-grid">
+                    <label class="field">
+                      <span>传导功率 (dBm)</span>
+                      <input class="calc-input" id="condPower" type="text" value="23.0" />
+                    </label>
+                    <label class="field">
+                      <span>EIRP (dBm)</span>
+                      <input class="result-input" id="eirpOutput" type="text" readonly />
+                    </label>
+                    <label class="field">
+                      <span>TRP (dBm)</span>
+                      <input class="result-input" id="trpOutput" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <h3>[有源接收 RX]</h3>
+                  <div class="field-grid">
+                    <label class="field">
+                      <span>传导灵敏度 (dBm)</span>
+                      <input class="calc-input" id="condSens" type="text" value="-95.0" />
+                    </label>
+                    <label class="field">
+                      <span>EIS (dBm)</span>
+                      <input class="result-input" id="eisOutput" type="text" readonly />
+                    </label>
+                    <label class="field">
+                      <span>TIS (dBm)</span>
+                      <input class="result-input" id="tisOutput" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="tool-card accent-indigo">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 08</p>
+                <h2>VSWR 与 Return Loss 换算</h2>
+                <p>同时给出反射系数、失配损耗和传输能量。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>驻波比 (VSWR)</span>
+                  <input class="calc-input" id="vswrInput" type="text" value="2.0" />
+                </label>
+                <label class="field">
+                  <span>回波损耗 RL (dB)</span>
+                  <input class="calc-input" id="rlInput" type="text" value="9.54" />
+                </label>
+                <label class="field">
+                  <span>反射系数 Γ</span>
+                  <input class="result-input" id="gammaOutput" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>失配损耗 ML (dB)</span>
+                  <input class="result-input" id="mlOutput" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>传输能量 (%)</span>
+                  <input class="result-input" id="transPctOutput" type="text" readonly />
+                </label>
+              </div>
+            </section>
+
+            <section class="tool-card accent-coral">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 09</p>
+                <h2>远场测试距离评估</h2>
+                <p>根据天线物理尺寸和频率计算 Fraunhofer Distance。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>天线最大轮廓 D (mm)</span>
+                  <input class="calc-input" id="ffDiameter" type="text" value="150" />
+                </label>
+                <label class="field">
+                  <span>频率 (MHz)</span>
+                  <input class="calc-input" id="ffFreq" type="text" value="2400" />
+                </label>
+                <label class="field">
+                  <span>远场最小距离 R (m)</span>
+                  <input class="result-input" id="ffMeters" type="text" readonly />
+                </label>
+                <label class="field">
+                  <span>远场最小距离 R (mm)</span>
+                  <input class="result-input" id="ffMillimeters" type="text" readonly />
+                </label>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="content-panel" id="formulas" hidden>
+          <div class="formula-intro">
+            <p class="section-kicker">Reference Library</p>
+            <h2>核心理论库与常用公式</h2>
+          </div>
+          <div class="formula-list" id="formulaList"></div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>Antenna Calculator · by Zhihao · v2026.03.26</p>
+      </footer>
+    </div>
+
+    <script src="./band-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
