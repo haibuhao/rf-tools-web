@@ -29,6 +29,11 @@
   --teal: #0b7f73;
   --indigo: #3754d6;
   --coral: #d96b45;
+  --pink: #d94582;
+  --violet: #8c40b8;
+  --gold: #cfa830;
+  --emerald: #1fa363;
+  --cyan: #0fa1b5;
 }
 
 * {
@@ -257,6 +262,31 @@ textarea {
 .tool-card.accent-coral {
   --accent: var(--coral);
   --accent-rgb: 217, 107, 69;
+}
+
+.tool-card.accent-pink {
+  --accent: var(--pink);
+  --accent-rgb: 217, 69, 130;
+}
+
+.tool-card.accent-violet {
+  --accent: var(--violet);
+  --accent-rgb: 140, 64, 184;
+}
+
+.tool-card.accent-gold {
+  --accent: var(--gold);
+  --accent-rgb: 207, 168, 48;
+}
+
+.tool-card.accent-emerald {
+  --accent: var(--emerald);
+  --accent-rgb: 31, 163, 99;
+}
+
+.tool-card.accent-cyan {
+  --accent: var(--cyan);
+  --accent-rgb: 15, 161, 181;
 }
 
 .card-head {

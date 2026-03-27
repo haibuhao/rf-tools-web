@@ -44,7 +44,9 @@
             </div>
           </div>
           <div class="cards-grid">
-            <section class="tool-card accent-blue">
+            
+
+<section class="tool-card accent-blue">
               <div class="card-stripe"></div>
               <div class="card-head">
                 <p class="card-kicker">Module 01</p>
@@ -75,7 +77,7 @@
               </div>
             </section>
 
-            <section class="tool-card accent-purple wide">
+<section class="tool-card accent-purple wide">
               <div class="card-stripe"></div>
               <div class="card-head">
                 <p class="card-kicker">Module 02</p>
@@ -94,10 +96,73 @@
               </div>
             </section>
 
-            <section class="tool-card accent-red">
+<section class="tool-card accent-cyan wide" id="smartMatchCard">
               <div class="card-stripe"></div>
               <div class="card-head">
                 <p class="card-kicker">Module 03</p>
+                <h2>渐进式智能阻抗匹配引擎</h2>
+                <p>工业级实战寻优：优先测算 2 颗件(L型)以降低寄生风险。若全频段驻波不及格，则无缝切换带寄生免疫约束（C &gt; 0.3pF, L &gt; 0.3nH）的 3 颗标准件(Π 型)穷举方案，直出最优真实购买物料表。</p>
+              </div>
+              <div class="cluster-grid">
+                <div class="cluster">
+                  <h3>1. 设定测试频点与阻抗 (首中尾)</h3>
+                  <div class="field-grid">
+                    <label class="field field-wide" style="border-bottom: 2px solid #eee; padding-bottom: 12px; margin-bottom: 8px;">
+                      <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--cyan); font-weight:700;">及格阈值 VSWR </span>
+                        <input class="calc-input" id="smVswrTarget" type="text" value="2.0" style="width:80px; text-align:right;" />
+                      </div>
+                    </label>
+
+                    <label class="field"><span>f1 (低频) MHz</span><input class="calc-input" id="smF1" type="text" value="" placeholder="选填" /></label>
+                    <label class="field"><span>R1 (Ω)</span><input class="calc-input" id="smR1" type="text" value="" placeholder="选填" /></label>
+                    <label class="field"><span>X1 (Ω)</span><input class="calc-input" id="smX1" type="text" value="" placeholder="选填" /></label>
+
+                    <label class="field"><span>f2 (中心) MHz</span><input class="calc-input" id="smF2" type="text" value="" placeholder="选填" /></label>
+                    <label class="field"><span>R2 (Ω)</span><input class="calc-input" id="smR2" type="text" value="" placeholder="选填" /></label>
+                    <label class="field"><span>X2 (Ω)</span><input class="calc-input" id="smX2" type="text" value="" placeholder="选填" /></label>
+
+                    <label class="field"><span>f3 (高频) MHz</span><input class="calc-input" id="smF3" type="text" value="" placeholder="选填" /></label>
+                    <label class="field"><span>R3 (Ω)</span><input class="calc-input" id="smR3" type="text" value="" placeholder="选填" /></label>
+                    <label class="field"><span>X3 (Ω)</span><input class="calc-input" id="smX3" type="text" value="" placeholder="选填" /></label>
+                  
+                    <label class="field field-wide" style="margin-top: 10px;">
+                      <button type="button" id="btnSmartMatch" style="width:100%; font-size: 16px; font-weight: bold; background: var(--cyan); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">🚀 运行离散物料网络穷举综合</button>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <div id="smAlertBox" style="margin-bottom:15px; padding:15px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:14px; color:#555; line-height: 1.5; min-height: 80px;">
+                     <em>等待执行宽频综合...</em>
+                  </div>
+                  <h3>2. 实战最优标准容感组合</h3>
+                  <div class="field-grid">
+                    <label class="field field-wide">
+                      <span>网络拓扑说明</span>
+                      <input class="result-input" id="smTopology" type="text" readonly style="color:var(--cyan); font-weight:bold;"/>
+                    </label>
+                    <label class="field" id="smFieldAnt">
+                      <span>[部位 1] 贴近天线端</span>
+                      <input class="result-input" id="smAntShunt" type="text" readonly />
+                    </label>
+                    <label class="field" id="smFieldMid">
+                      <span>[部位 2] 中间串联线</span>
+                      <input class="result-input" id="smSeries" type="text" readonly />
+                    </label>
+                    <label class="field" id="smFieldSrc">
+                      <span>[部位 3] 贴近源/芯片</span>
+                      <input class="result-input" id="smSrcShunt" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+<section class="tool-card accent-red">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 05</p>
                 <h2>自由空间路径损耗</h2>
                 <p>按米和 MHz 计算 FSPL。</p>
               </div>
@@ -117,10 +182,10 @@
               </div>
             </section>
 
-            <section class="tool-card accent-orange">
+<section class="tool-card accent-orange">
               <div class="card-stripe"></div>
               <div class="card-head">
-                <p class="card-kicker">Module 04</p>
+                <p class="card-kicker">Module 06</p>
                 <h2>效率与 dB 换算</h2>
                 <p>按功率效率换算，50% 对应约 -3.01 dB。</p>
               </div>
@@ -136,12 +201,12 @@
               </div>
             </section>
 
-            <section class="tool-card accent-green">
+<section class="tool-card accent-green">
               <div class="card-stripe"></div>
               <div class="card-head">
-                <p class="card-kicker">Module 05</p>
+                <p class="card-kicker">Module 07</p>
                 <h2>dBm 与 Watt 转换</h2>
-                <p>双向换算功率单位，按当前输入侧实时更新另一侧。</p>
+                <p>双向换算功率单位，网页端按当前输入侧实时更新另一侧。</p>
               </div>
               <div class="field-grid">
                 <label class="field">
@@ -155,10 +220,10 @@
               </div>
             </section>
 
-            <section class="tool-card accent-cyan">
+<section class="tool-card accent-cyan">
               <div class="card-stripe"></div>
               <div class="card-head">
-                <p class="card-kicker">Module 06</p>
+                <p class="card-kicker">Module 08</p>
                 <h2>多天线合成增益</h2>
                 <p>输入多个天线增益，自动输出非相干和相干合成结果。</p>
               </div>
@@ -178,12 +243,12 @@
               </div>
             </section>
 
-            <section class="tool-card accent-teal wide">
+<section class="tool-card accent-teal wide">
               <div class="card-stripe"></div>
               <div class="card-head">
-                <p class="card-kicker">Module 07</p>
+                <p class="card-kicker">Module 09</p>
                 <h2>有源与无源指标等效预估</h2>
-                <p>输入增益和效率，反推方向性，并联动计算 EIRP / TRP / EIS / TIS。</p>
+                <p>按你当前桌面版逻辑，输入增益和效率，反推方向性，并联动计算 EIRP / TRP / EIS / TIS。</p>
               </div>
               <div class="cluster-grid">
                 <div class="cluster">
@@ -242,10 +307,10 @@
               </div>
             </section>
 
-            <section class="tool-card accent-indigo">
+<section class="tool-card accent-indigo">
               <div class="card-stripe"></div>
               <div class="card-head">
-                <p class="card-kicker">Module 08</p>
+                <p class="card-kicker">Module 10</p>
                 <h2>VSWR 与 Return Loss 换算</h2>
                 <p>同时给出反射系数、失配损耗和传输能量。</p>
               </div>
@@ -273,10 +338,10 @@
               </div>
             </section>
 
-            <section class="tool-card accent-coral">
+<section class="tool-card accent-coral">
               <div class="card-stripe"></div>
               <div class="card-head">
-                <p class="card-kicker">Module 09</p>
+                <p class="card-kicker">Module 11</p>
                 <h2>远场测试距离评估</h2>
                 <p>根据天线物理尺寸和频率计算 Fraunhofer Distance。</p>
               </div>
@@ -299,16 +364,164 @@
                 </label>
               </div>
             </section>
+
+<section class="tool-card accent-pink wide">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 12</p>
+                <h2>ZOR 零阶谐振器参数综合</h2>
+                <p>输入目标频率以及微带主体的本征参数，反推所需超材料(CRLH)部分的寄生电感和寄生电容。并顺带提供通过物理尺寸预估接地过孔/短截线引脚电感的快捷工具。</p>
+              </div>
+              <div class="cluster-grid">
+                <div class="cluster">
+                  <h3>[输入] 设计目标与宿主</h3>
+                  <div class="field-grid">
+                    <label class="field field-wide">
+                      <span>目标零阶频率 f0 (MHz)</span>
+                      <input class="calc-input" id="zorFreq" type="text" value="2000" />
+                    </label>
+                    <label class="field">
+                      <span>右手宿主 并联电容 CR (pF)</span>
+                      <input class="calc-input" id="zorCr" type="text" value="1.5" />
+                    </label>
+                    <label class="field">
+                      <span>右手宿主 串联电感 LR (nH)</span>
+                      <input class="calc-input" id="zorLr" type="text" value="2.5" />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <h3>[综合] 所需 CRLH 等效参数</h3>
+                  <div class="field-grid">
+                    <label class="field field-wide">
+                      <span>所需左手并联电感 LL (nH)</span>
+                      <input class="result-input" id="zorReqLl" type="text" readonly />
+                    </label>
+                    <label class="field field-wide">
+                      <span>所需左手串联电容 CL (pF)</span>
+                      <input class="result-input" id="zorReqCl" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <h3>[辅助] 接地过孔/短截线电感预估</h3>
+                  <div class="field-grid">
+                    <label class="field">
+                      <span>板厚/线长 h (mm)</span>
+                      <input class="calc-input" id="viaHeight" type="text" value="1.0" />
+                    </label>
+                    <label class="field">
+                      <span>孔径/线宽 d (mm)</span>
+                      <input class="calc-input" id="viaDiam" type="text" value="0.5" />
+                    </label>
+                    <label class="field field-wide">
+                      <span>预估实现电感量 (nH)</span>
+                      <input class="result-input" id="viaEstInd" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+<section class="tool-card accent-violet wide">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 13</p>
+                <h2>微带线特征阻抗综合</h2>
+                <p>基于 Wheeler/Hammerstad 经验公式，实时预估微带线阻抗（输入 W 出 Z0）或自动用二分法倒推所需馈线线宽（输入目标 Z0 出 W）。</p>
+              </div>
+              <div class="cluster-grid">
+                <div class="cluster">
+                  <h3>[基材] 板材分布参数</h3>
+                  <div class="field-grid">
+                    <label class="field">
+                      <span>介电常数 εr</span>
+                      <input class="calc-input" id="msEr" type="text" value="4.4" />
+                    </label>
+                    <label class="field">
+                      <span>板厚 h (mm)</span>
+                      <input class="calc-input" id="msH" type="text" value="1.6" />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <h3>[预估] 已知线宽 -> 阻抗</h3>
+                  <div class="field-grid">
+                    <label class="field field-wide">
+                      <span>测试线宽 W (mm)</span>
+                      <input class="calc-input" id="msW" type="text" value="3.05" />
+                    </label>
+                    <label class="field">
+                      <span>特性阻抗 Z0 (Ω)</span>
+                      <input class="result-input" id="msZ0Result" type="text" readonly />
+                    </label>
+                    <label class="field">
+                      <span>有效介电常数 εeff</span>
+                      <input class="result-input" id="msEeffResult" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="cluster">
+                  <h3>[综合] 目标阻抗 -> 线宽</h3>
+                  <div class="field-grid">
+                    <label class="field field-wide">
+                      <span>设计阻抗 Z0 (Ω)</span>
+                      <input class="calc-input" id="msTargetZ0" type="text" value="50" />
+                    </label>
+                    <label class="field field-wide">
+                      <span>对应完美线宽 W (mm)</span>
+                      <input class="result-input" id="msWResult" type="text" readonly />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+<section class="tool-card accent-emerald">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 14</p>
+                <h2>品质因数 (Q) / 分数带宽换算</h2>
+                <p>核算小型化天线学术指标，逼近物理极限。</p>
+              </div>
+              <div class="field-grid">
+                <label class="field">
+                  <span>共振中心频率 fc (MHz)</span>
+                  <input class="calc-input" id="qFreq" type="text" value="2400" />
+                </label>
+                <label class="field">
+                  <span>无源绝对带宽 Δf (MHz)</span>
+                  <input class="calc-input" id="qBw" type="text" value="100" />
+                </label>
+                <label class="field">
+                  <span>匹配测试门限 (VSWR)</span>
+                  <input class="calc-input" id="qVswr" type="text" value="2.0" />
+                </label>
+                <label class="field">
+                  <span>提取分数带宽 FBW (%)</span>
+                  <input class="result-input" id="qFbwResult" type="text" readonly />
+                </label>
+                <label class="field field-wide">
+                  <span>系统等效品质因数 Q (极小)</span>
+                  <input class="result-input" id="qResult" type="text" readonly />
+                </label>
+              </div>
+            </section>
           </div>
         </section>
 
-        <section class="content-panel" id="formulas" hidden>
-          <div class="formula-intro">
-            <p class="section-kicker">Reference Library</p>
-            <h2>核心理论库与常用公式</h2>
+        <!-- 第 2 个选项卡：常用公式 (被 JS 渲染) -->
+        <section id="formulas" class="content-panel" hidden>
+          <div class="formulas-container">
+            <h2>射频工程公式备忘录 (Reference)</h2>
+            <div id="formulaList" class="formula-grid"></div>
           </div>
-          <div class="formula-list" id="formulaList"></div>
         </section>
+
       </main>
 
       <footer class="site-footer">
@@ -317,6 +530,7 @@
     </div>
 
     <script src="./band-data.js"></script>
+    <script src="./components-data.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
