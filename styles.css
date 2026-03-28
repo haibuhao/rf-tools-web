@@ -535,3 +535,91 @@ code {
   }
 
 }
+
+/* ── Links / Bookmarks Tab ── */
+.links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.links-tag {
+  margin: 0;
+  padding: 6px 14px;
+  display: inline-block;
+  width: fit-content;
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text-inverse);
+  font-family: var(--font-head);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.links-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.link-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(18, 29, 43, 0.12);
+  border-color: var(--cyan);
+}
+
+.link-name {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.link-desc {
+  font-size: 0.88rem;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.link-arrow {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 1.1rem;
+  color: var(--text-soft);
+  opacity: 0.4;
+  transition: opacity 0.18s ease, color 0.18s ease;
+}
+
+.link-card:hover .link-arrow {
+  opacity: 1;
+  color: var(--cyan);
+}
+
+@media (max-width: 760px) {
+  .links-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

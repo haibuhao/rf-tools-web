@@ -33,6 +33,9 @@
         <button class="tab-button" data-tab-target="formulas" type="button">
           常用公式库
         </button>
+        <button class="tab-button" data-tab-target="links" type="button">
+          常用网站收录
+        </button>
       </nav>
 
       <main class="content-stack">
@@ -522,6 +525,17 @@
           </div>
         </section>
 
+        <!-- 第 3 个选项卡：常用网站收录 (被 JS 渲染) -->
+        <section id="links" class="content-panel" hidden>
+          <div class="section-intro">
+            <div>
+              <p class="section-kicker">Useful Links</p>
+              <h2>射频工程师常用网站</h2>
+            </div>
+          </div>
+          <div id="linksList" class="links-grid"></div>
+        </section>
+
       </main>
 
       <footer class="site-footer">
@@ -531,6 +545,7 @@
 
     <script src="./band-data.js"></script>
     <script src="./components-data.js"></script>
+    <script src="./links-data.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

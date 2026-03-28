@@ -157,6 +157,58 @@ function renderFormulas() {
   });
 }
 
+function renderLinks() {
+  const linksData = window.LINKS_DATA || [];
+  const container = $("linksList");
+  if (!container || !linksData.length) return;
+
+  // Group by tag
+  const groups = {};
+  linksData.forEach(item => {
+    if (!groups[item.tag]) groups[item.tag] = [];
+    groups[item.tag].push(item);
+  });
+
+  Object.keys(groups).forEach(tag => {
+    const section = document.createElement("div");
+    section.className = "links-section";
+
+    const heading = document.createElement("h3");
+    heading.className = "links-tag";
+    heading.textContent = tag;
+    section.append(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "links-card-grid";
+
+    groups[tag].forEach(link => {
+      const a = document.createElement("a");
+      a.href = link.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.className = "link-card";
+
+      const name = document.createElement("span");
+      name.className = "link-name";
+      name.textContent = link.name;
+
+      const desc = document.createElement("span");
+      desc.className = "link-desc";
+      desc.textContent = link.desc;
+
+      const arrow = document.createElement("span");
+      arrow.className = "link-arrow";
+      arrow.textContent = "↗";
+
+      a.append(name, desc, arrow);
+      grid.append(a);
+    });
+
+    section.append(grid);
+    container.append(section);
+  });
+}
+
 function setupTabs() {
   const buttons = document.querySelectorAll(".tab-button");
   const panels = document.querySelectorAll(".content-panel");
@@ -698,6 +750,7 @@ function bindEvents() {
 function init() {
   wireSelectAll();
   renderFormulas();
+  renderLinks();
   setupTabs();
   bindEvents();
 
