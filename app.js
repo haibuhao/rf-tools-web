@@ -587,18 +587,18 @@ function processSmartMatch() {
       if(f > 0 && R > 0 && isFiniteNumber(X)) pts.push({ fHz: f, Z: { R, X } });
   }
   if (pts.length === 0 || !isFiniteNumber(thresh)) {
-      setOutputs(["smTopology", "smAntShunt", "smSeries", "smSrcShunt"]);
+      $("smResultsList").innerHTML = "";
       return;
   }
 
-  $("smAlertBox").innerHTML = "<em>正在暴力推演庞大组合，请稍候...</em>";
+  $("smAlertBox").innerHTML = "<em>正在推演组合，请稍候...</em>";
   $("smAlertBox").style.background = "rgba(0,0,0,0.03)";
   $("smAlertBox").style.color = "#555";
   setTimeout(() => runSmartMatch(pts, thresh), 10);
 }
 
 function runSmartMatch(pts, thresh) {
-    let bestL = { maxV: Infinity, top: "", c1: "", c2: "", c3: "" };
+    let allL = [];
     const comps = ["C", "L"];
 
     // L-Net: Shunt Antenna -> Series Source
@@ -618,10 +618,12 @@ function runSmartMatch(pts, thresh) {
                         tempVswrs.push(v);
                         maxV = Math.max(maxV, v);
                     }
-                    if (maxV < bestL.maxV) {
-                        bestL = { maxV, vswrs: tempVswrs, top: "L型倒置: [并联] ➔ [串联] ➔ 接匹配端",
+                    // Keep networks that are somewhat reasonable
+                    if(maxV < 100) {
+                        allL.push({ maxV, vswrs: tempVswrs, top: "L型倒置: [并联] ➔ [串联] ➔ 接输入端",
                                   c1: `${sh} = ${v1} ${sh==="L"?"nH":"pF"} (对地并联)`, 
-                                  c2: `${se} = ${v2} ${se==="L"?"nH":"pF"} (在线串联)`, c3: "---" };
+                                  c2: `${se} = ${v2} ${se==="L"?"nH":"pF"} (在线串联)`, c3: "---",
+                                  raw: { net: 'L1', comp1: sh, val1: v1, comp2: se, val2: v2 } });
                     }
                 }
             }
@@ -645,24 +647,30 @@ function runSmartMatch(pts, thresh) {
                         tempVswrs.push(v);
                         maxV = Math.max(maxV, v);
                     }
-                    if (maxV < bestL.maxV) {
-                        bestL = { maxV, vswrs: tempVswrs, top: "L型顺序: [串联] ➔ [并联] ➔ 接匹配端",
+                    if(maxV < 100) {
+                        allL.push({ maxV, vswrs: tempVswrs, top: "L型顺序: [串联] ➔ [并联] ➔ 接输入端",
                                   c1: `${se} = ${v1} ${se==="L"?"nH":"pF"} (在线串联)`, 
-                                  c2: `${sh} = ${v2} ${sh==="L"?"nH":"pF"} (对地并联)`, c3: "---" };
+                                  c2: `${sh} = ${v2} ${sh==="L"?"nH":"pF"} (对地并联)`, c3: "---",
+                                  raw: { net: 'L2', comp1: se, val1: v1, comp2: sh, val2: v2 } });
                     }
                 }
             }
         }
     }
 
-    let vswrStrL = pts.map((_, i) => `f${i+1}: ${formatFixed(bestL.vswrs[i], 2)}`).join(" | ");
-    if (bestL.maxV <= thresh) {
-        renderMatchResult(bestL, `✅ L 型极简网络及格！<br/>测算点最差驻波比 VSWR = <strong style="color:#1e8e3e;font-size:16px;">${formatFixed(bestL.maxV,2)}</strong><br/><span style="font-size:12px">测算点实绩: [ ${vswrStrL} ]</span>`, "#e6f4ea", "#1e8e3e");
+    allL.sort((a, b) => a.maxV - b.maxV);
+    let topL = allL.slice(0, 5);
+    
+    // Check if the absolute best L-network passed the threshold
+    if (topL.length > 0 && topL[0].maxV <= thresh) {
+        let vswrStrL = pts.map((_, i) => `f${i+1}: ${formatFixed(topL[0].vswrs[i], 2)}`).join(" | ");
+        const titleMsg = `✅ L 型匹配网络满足要求<br/>最佳方案最大 VSWR = <strong style="color:#1e8e3e;font-size:16px;">${formatFixed(topL[0].maxV,2)}</strong><br/><span style="font-size:12px">各测算点 VSWR: [ ${vswrStrL} ]</span>`;
+        renderMatchResults(topL, titleMsg, "#e6f4ea", "#1e8e3e");
         return;
     }
 
     // Pi-Network (3 elements) C-L-C Low Pass Fallback with strict limits > 0.3pF, > 0.3nH
-    let bestPi = { maxV: Infinity, top: "", c1: "", c2: "", c3: "" };
+    let allPi = [];
     for (let c1 of STD_C) {
         if (c1 < 0.3) continue;
         for (let l2 of STD_L) {
@@ -680,27 +688,99 @@ function runSmartMatch(pts, thresh) {
                     tempVswrs.push(v);
                     maxV = Math.max(maxV, v);
                 }
-                if (maxV < bestPi.maxV) {
-                    bestPi = { maxV, vswrs: tempVswrs, top: "Π 型经典低通宽频: (并联 ➔ 串联 ➔ 并联)",
-                              c1: `C = ${c1} pF (对地并联)`, c2: `L = ${l2} nH (在线串联)`, c3: `C = ${c3} pF (对地并联)` };
+                if (maxV < 100) { // Keep networks that are somewhat reasonable
+                    allPi.push({ maxV, vswrs: tempVswrs, top: "Π 型经典低通宽频: (并联 ➔ 串联 ➔ 并联)",
+                              c1: `C1 = ${c1} pF (对地并联)`, c2: `L2 = ${l2} nH (在线串联)`, c3: `C3 = ${c3} pF (对地并联)`,
+                              raw: { net: 'Pi', comp1: 'C', val1: c1, comp2: 'L', val2: l2, comp3: 'C', val3: c3 } });
                 }
             }
         }
     }
 
-    let vswrStrPi = pts.map((_, i) => `f${i+1}: ${formatFixed(bestPi.vswrs[i], 2)}`).join(" | ");
-    let msg = `⚠️ <strong>带宽不足预警</strong>：L型网络最优仅能压到 <span style="color:#d93025">${formatFixed(bestL.maxV,2)}</span>，不满足门限。<br/>`;
-    msg += `🚀 <strong>强启 Π 型稳固综合引擎</strong>：严格防寄生 (<0.3失效) 筛选库求出三元件最优组合。<br/>极限封顶 VSWR = <strong style="color:#d93025;font-size:16px;">${formatFixed(bestPi.maxV,2)}</strong> <br/><span style="font-size:12px;color:#d93025">测算点实绩: [ ${vswrStrPi} ]</span>`;
-    renderMatchResult(bestPi, msg, "#fce8e6", "#d93025");
+    allPi.sort((a, b) => a.maxV - b.maxV);
+    let topPi = allPi.slice(0, 5);
+
+    let vswrStrPi = pts.map((_, i) => `f${i+1}: ${formatFixed(topPi[0].vswrs[i], 2)}`).join(" | ");
+    let msg = `⚠️ <strong>提示</strong>：L型网络最低能达到驻波 <span style="color:#d93025">${formatFixed(allL.length ? allL[0].maxV : 999, 2)}</span>，未满足门限。<br/>`;
+    msg += `<strong>切换至 Π 型匹配网络计算</strong>：带寄生限制自动筛选三元件组合。<br/>最大 VSWR = <strong style="color:#d93025;font-size:16px;">${formatFixed(topPi[0].maxV,2)}</strong> <br/><span style="font-size:12px;color:#d93025">各测算点 VSWR: [ ${vswrStrPi} ]</span>`;
+    renderMatchResults(topPi, msg, "#fce8e6", "#d93025");
 }
 
-function renderMatchResult(res, msgHtml, bgColor, txtColor) {
+function getRecommendationBadge(raw) {
+    if (!raw) return "";
+    let badges = [];
+    let lCount = 0;
+    
+    if (raw.net.startsWith('L')) {
+        badges.push('<span style="background:#e6f4ea; color:#1e8e3e; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">结构简单 (2元件)</span>');
+        if (raw.comp1 === 'L') lCount++;
+        if (raw.comp2 === 'L') lCount++;
+        
+        let isLowPass = false;
+        if (raw.net === 'L1' && raw.comp2 === 'L' && raw.comp1 === 'C') isLowPass = true;
+        if (raw.net === 'L2' && raw.comp1 === 'L' && raw.comp2 === 'C') isLowPass = true;
+        
+        if (isLowPass) {
+            badges.push('<span style="background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">👍 推荐 (低通滤波)</span>');
+        }
+    } else if (raw.net === 'Pi') {
+        badges.push('<span style="background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">低通滤波</span>');
+        lCount = 1;
+    }
+
+    if (lCount === 0) {
+        badges.push('<span style="background:#fce8e6; color:#d93025; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">🌟 极低损耗 (纯电容)</span>');
+    } else if (lCount >= 2) {
+        badges.push('<span style="background:#fef7e0; color:#e08400; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">⚠️ 损耗可能偏高 (多电感)</span>');
+    }
+
+    let hasExtreme = false;
+    let vals = [raw.val1, raw.val2];
+    if (raw.val3) vals.push(raw.val3);
+    for (let v of vals) {
+        if (v < 0.8) hasExtreme = true;
+    }
+    if (hasExtreme) {
+        badges.push('<span style="background:#fef7e0; color:#e08400; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">⚠️ 元件值较小，易受寄生参数影响</span>');
+    }
+
+    return badges.join('');
+}
+
+function renderMatchResults(results, msgHtml, bgColor, txtColor) {
     $("smAlertBox").innerHTML = msgHtml;
     $("smAlertBox").style.background = bgColor;
-    $("smTopology").value = res.top;
-    $("smAntShunt").value = res.c1;
-    $("smSeries").value = res.c2;
-    $("smSrcShunt").value = res.c3;
+    
+    const container = $("smResultsList");
+    container.innerHTML = "";
+    
+    if(!results || results.length === 0) {
+        container.innerHTML = "<p>未能找到任何可用匹配组合。</p>";
+        return;
+    }
+    
+    results.forEach((res, index) => {
+        const c3Html = res.c3 !== "---" ? `<div>[3]: ${res.c3}</div>` : "";
+        const itemHtml = `
+          <div class="match-result-card" style="margin-bottom: 12px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff;">
+            <div style="font-weight: 700; color: ${txtColor}; margin-bottom: 8px; display: flex; justify-content: space-between;">
+              <span>#${index + 1} 推荐组合 (Max VSWR: ${formatFixed(res.maxV, 2)})</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              ${getRecommendationBadge(res.raw)}
+            </div>
+            <div style="font-size: 13px; color: var(--text-soft); margin-bottom: 6px;">
+              <strong>拓扑:</strong> ${res.top}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 14px; background: var(--bg-2); padding: 8px; border-radius: 6px;">
+              <div>[1]: ${res.c1}</div>
+              <div>[2]: ${res.c2}</div>
+              ${c3Html}
+            </div>
+          </div>
+        `;
+        container.innerHTML += itemHtml;
+    });
 }
 
 function bindEvents() {

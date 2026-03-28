@@ -103,8 +103,8 @@
               <div class="card-stripe"></div>
               <div class="card-head">
                 <p class="card-kicker">Module 03</p>
-                <h2>渐进式智能阻抗匹配引擎</h2>
-                <p>工业级实战寻优：优先测算 2 颗件(L型)以降低寄生风险。若全频段驻波不及格，则无缝切换带寄生免疫约束（C &gt; 0.3pF, L &gt; 0.3nH）的 3 颗标准件(Π 型)穷举方案，直出最优真实购买物料表。</p>
+                <h2>阻抗匹配网络综合工具</h2>
+                <p>优先评估 2 元件(L型)匹配方案以降低寄生效应风险。若全频段驻波不及格，则自动切换至带有寄生参数约束（C &gt; 0.3pF, L &gt; 0.3nH）的 3 元件(Π 型)综合方案，并输出可用的标准物料组合。</p>
               </div>
               <div class="cluster-grid">
                 <div class="cluster">
@@ -130,7 +130,7 @@
                     <label class="field"><span>X3 (Ω)</span><input class="calc-input" id="smX3" type="text" value="" placeholder="选填" /></label>
                   
                     <label class="field field-wide" style="margin-top: 10px;">
-                      <button type="button" id="btnSmartMatch" style="width:100%; font-size: 16px; font-weight: bold; background: var(--cyan); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">🚀 运行离散物料网络穷举综合</button>
+                      <button type="button" id="btnSmartMatch" style="width:100%; font-size: 16px; font-weight: bold; background: var(--cyan); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">运行阻抗匹配网络计算</button>
                     </label>
                   </div>
                 </div>
@@ -139,24 +139,9 @@
                   <div id="smAlertBox" style="margin-bottom:15px; padding:15px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:14px; color:#555; line-height: 1.5; min-height: 80px;">
                      <em>等待执行宽频综合...</em>
                   </div>
-                  <h3>2. 实战最优标准容感组合</h3>
-                  <div class="field-grid">
-                    <label class="field field-wide">
-                      <span>网络拓扑说明</span>
-                      <input class="result-input" id="smTopology" type="text" readonly style="color:var(--cyan); font-weight:bold;"/>
-                    </label>
-                    <label class="field" id="smFieldAnt">
-                      <span>[部位 1] 贴近天线端</span>
-                      <input class="result-input" id="smAntShunt" type="text" readonly />
-                    </label>
-                    <label class="field" id="smFieldMid">
-                      <span>[部位 2] 中间串联线</span>
-                      <input class="result-input" id="smSeries" type="text" readonly />
-                    </label>
-                    <label class="field" id="smFieldSrc">
-                      <span>[部位 3] 贴近源/芯片</span>
-                      <input class="result-input" id="smSrcShunt" type="text" readonly />
-                    </label>
+                  <h3>2. 推荐标准元器件组合</h3>
+                  <div id="smResultsList">
+                    <!-- Top 5 结果将由 JS 动态生成到这里 -->
                   </div>
                 </div>
               </div>
