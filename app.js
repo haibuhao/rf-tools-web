@@ -286,6 +286,26 @@ function syncDbFromEfficiency() {
   $("effDbInput").value = formatFixed(db, 4);
 }
 
+function syncGainLinFromDb() {
+  const db = parseFloat($("gainDbInput").value);
+  if (!isFiniteNumber(db)) {
+    $("gainLinInput").value = "";
+    return;
+  }
+  const lin = 10 ** (db / 10);
+  $("gainLinInput").value = formatFixed(lin, 3);
+}
+
+function syncDbFromGainLin() {
+  const lin = parseFloat($("gainLinInput").value);
+  if (!(lin > 0)) {
+    $("gainDbInput").value = "";
+    return;
+  }
+  const db = 10 * Math.log10(lin);
+  $("gainDbInput").value = formatFixed(db, 3);
+}
+
 function syncWattFromDbm() {
   const dbm = parseFloat($("dbmInput").value);
   if (!isFiniteNumber(dbm)) {
@@ -792,6 +812,9 @@ function bindEvents() {
   $("effDbInput").addEventListener("input", syncEfficiencyFromDb);
   $("effPctInput").addEventListener("input", syncDbFromEfficiency);
 
+  $("gainDbInput").addEventListener("input", syncGainLinFromDb);
+  $("gainLinInput").addEventListener("input", syncDbFromGainLin);
+
   $("dbmInput").addEventListener("input", syncWattFromDbm);
   $("wattInput").addEventListener("input", syncDbmFromWatt);
 
@@ -838,6 +861,7 @@ function init() {
   queryBand();
   calcFspl();
   syncEfficiencyFromDb();
+  syncGainLinFromDb();
   syncWattFromDbm();
   calcArrayGain();
   calcActivePassive();
