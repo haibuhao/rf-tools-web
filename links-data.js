@@ -34,6 +34,7 @@ window.LINKS_DATA = [
 
  
   // ── 专利检索 ──
+  { name: "专利之星检索系统", url: "https://cprs.patentstar.com.cn/Search/Index", desc: "专利之星检索系统，支持检索和下载", tag: "专利检索" },
   { name: "Google Patents", url: "https://patents.google.com/", desc: "最易用的免费专利搜索引擎，支持全文检索和引用分析", tag: "专利检索" },
   { name: "Espacenet (EPO)", url: "https://worldwide.espacenet.com/", desc: "欧洲专利局官方检索，支持机器翻译非英文专利", tag: "专利检索" },
   { name: "WIPO PATENTSCOPE", url: "https://patentscope.wipo.int/", desc: "世界知识产权组织 PCT 国际专利申请检索", tag: "专利检索" },
