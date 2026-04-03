@@ -1,6 +1,7 @@
 # RF Tools Web
-1. 射频计算器与天线理论库的静态网页版，适合直接放到 GitHub。
+1. 射频计算器与天线理论库的静态网页版。
 2. 本人知识储备有限，仅供自己学习使用，如有不严谨地方，请赐教。
+3. 如需新增计算，大可联系我。
 ## 文件结构
 
 - `index.html`: 页面结构
@@ -11,14 +12,8 @@
 
 ## 本地预览
 
-直接双击 `index.html` 通常也能打开，但更推荐起一个静态服务器预览：
-
-```bash
-cd rf-tools-web
-python3 -m http.server 8000
+直接双击 `index.html` 通常也能打开
 ```
-
-然后访问 [http://localhost:8000](http://localhost:8000)。
 
 ## GitHub Pages 免费部署
 
