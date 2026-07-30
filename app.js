@@ -1,107 +1,120 @@
 const formulasData = [
-
   {
-    title: "1. 3D 空间极化合成 (Total Gain)",
-    desc: "在暗室只提供分极化(H 和 V)数据时，本系统在后台使用功率域叠加退回合成总增益。",
-    math: "Gain_Total (dB) = 10 * log10( 10^(Gain_H / 10) + 10^(Gain_V / 10) )",
+    title: "自由空间波长",
+    desc: "使用真空光速 c = 299,792,458 m/s；实际介质中的导波波长还取决于有效介电常数。",
+    math: "λ = c / f\nλ/2 = c / (2f)\nλ/4 = c / (4f)",
   },
-
   {
-    title: "2. 辐射效率与方向性 (Efficiency & Directivity)",
-    desc: "使用球面立体角微元 dΩ = sin(θ)dθdφ 作为带权重的二重积分，对齐 SATIMO/GTS 暗室底层算法。",
-    math:
-      "Average_Gain (Linear) = Σ [ 10^(Gain/10) * sin(θ) * dθ * dφ ] / Σ [ sin(θ) * dθ * dφ ]\n\nEfficiency (%) = Average_Gain * 100\n\nDirectivity (dBi) = Peak_Gain (dBi) - 10 * log10(Average_Gain)",
+    title: "自由空间路径损耗 (FSPL)",
+    desc: "只描述无障碍自由空间传播，不含天线增益、馈线损耗、极化失配或遮挡；d 用米、f 用 MHz。",
+    math: "FSPL (dB) = 20 log10(d) + 20 log10(f) - 27.5522",
   },
-
   {
-    title: "03. 史密斯圆图单频 L 型阻抗匹配 (L-Section Matching)",
-    desc: "将复数负载 (RL+jXL) 匹配到 50 欧姆。有两个准则：如果实部 RL 大于 50 欧姆，先并在负载侧，后串在源端；如果 RL 小于 50 欧姆，先串在负载侧，后并在源端（这可以通过 Q 因子原理证明）。",
-    math: "并联导纳 Bp = 1 / Xp, 串联阻抗 Xs。目标: Rin = 50 且 Xin = 0。\n当电抗需要是正数，则该元件为电感 L = X / (2πf)。\n当电抗需要是负数，则该元件为电容 C = -1 / (2πfX)。",
+    title: "效率、增益与线性值",
+    desc: "效率是功率比，物理被动天线范围为 0–100%；普通功率增益的 dB/线性换算不受 100% 上限约束。",
+    math: "η (%) = 100 × 10^(ηdB / 10)\nηdB = 10 log10(η / 100)\nGlinear = 10^(GdB / 10)",
   },
-
   {
-    title: "04. 双阶宽频阻抗匹配 (Pi / T 型网络)",
-    desc: "宽带必备算法。通过寻找匹配中间节点阻抗 R_mid = √(50 × R_antenna)，将单级 L 网降维成两个低 Q 值的 L 网络级联。并联器件相邻合并成 Π 型，串联相邻合并成 T 型。",
-    math: "降 Q 思路：总匹配频带不仅满足 f_c，还能大幅拉平两端驻波。\\nΠ 型特征：头尾对地并联元件，中间串联。\\nT 型特征：头尾串联元件，中间对地并联。",
+    title: "dBm 与 Watt",
+    desc: "dBm 以 1 mW 为参考。0 W 对应负无穷 dBm，不能用有限数字表示。",
+    math: "P(W) = 10^[(PdBm - 30) / 10]\nPdBm = 10 log10[P(W)] + 30",
   },
-
   {
-    title: "3. 阵列合成：非相干叠加 (Uncorrelated Gain)",
-    desc: "模拟 MIMO / 分集天线中，各天线端口互相独立、相位随机的情况。纯功率域叠加后求均值。",
-    math: "Gain_Uncorrelated (dB) = 10 * log10[ (1/N) * Σ 10^(Gain_i / 10) ]",
+    title: "阵列合成（固定总输入功率）",
+    desc: "假设 N 路等功率分配、理想无损馈电，并在同一指定方向评估；未计端口耦合、幅相误差和实际合路损耗。",
+    math: "G非相干 = 10 log10[(1/N) Σ 10^(Gi/10)]\nG相干 = 20 log10[(1/√N) Σ 10^(Gi/20)]",
   },
-
   {
-    title: "4. 阵列合成：相干叠加 (Correlated / Beamforming Gain)",
-    desc: "模拟 5G 毫米波波束赋形，假设各阵子馈电相位同相叠加(电压域叠加)。除以 √N 用于总馈电功率归一化。",
-    math: "Gain_Correlated (dB) = 20 * log10[ (1/√N) * Σ 10^(Gain_i / 20) ]",
+    title: "有源与无源指标等效估算",
+    desc: "峰值实现增益与总效率必须位于同一参考面。TRP/TIS 的严格定义是球面综合量；这里由传导结果和无源量作一阶估算。",
+    math: "D = G - ηdB\nEIRP = Pcond + G\nTRP ≈ Pcond + ηdB\nEISdirection ≈ Scond - G\nTIS ≈ Scond - ηdB",
   },
-
   {
-    title: "5. 空间覆盖率 (Spatial Coverage / CDF)",
-    desc: "评估大于某个阈值的有效辐射面积占整个物理球面的百分比。",
-    math: "Coverage (%) = [ Σ(sin(θ)_pass) / Σ(sin(θ)_all) ] * 100",
+    title: "VSWR、Return Loss 与失配",
+    desc: "本页采用正值 Return Loss 约定：完全匹配时 RL = +∞，完全反射时 RL = 0 dB。",
+    math: "|Γ| = (VSWR - 1)/(VSWR + 1) = 10^(-RL/20)\nRL = -20 log10|Γ|\nML = -10 log10(1-|Γ|²)\n端口接受功率 = (1-|Γ|²) × 100%",
   },
-
   {
-    title: "6. 效率(%) 与 dB 换算",
-    desc: "天线效率常用百分比和 dB 两种形式表达。这里按功率效率换算，例如 50% 对应 -3.01 dB。",
-    math: "Efficiency (%) = 10^(dB / 10) * 100\n\ndB = 10 * log10(Efficiency / 100)\n\n示例: 50% = 10 * log10(0.5) = -3.01 dB",
+    title: "Fraunhofer 远场边界",
+    desc: "D 为 DUT 最大物理尺寸。该常用判据并不自动覆盖所有电小天线、测量探头和暗室误差条件。",
+    math: "R = 2D² / λ",
   },
-
   {
-    title: "7. 有源与无源指标等效评估 (Active vs Passive)",
-    desc: "打通无源(Passive)与有源(OTA)测试的核心链路，用于快速预估整机辐射性能。网页版当前按桌面版最新逻辑，输入增益和效率，反推方向性。",
-    math:
-      "Directionality (dBi) = Gain (dBi) - Efficiency (dB)\n\nEIRP (dBm) = Conducted Power (dBm) + Gain (dBi)\nTRP (dBm) = Conducted Power (dBm) + Efficiency (dB)\n\nEIS (dBm) = Conducted Sensitivity (dBm) - Gain (dBi)\nTIS (dBm) = Conducted Sensitivity (dBm) - Efficiency (dB)",
+    title: "离散器件阻抗匹配",
+    desc: "候选网络按理想 L/C 计算，并在所有有效频点上以最差 VSWR 复核；优先选择已达标的更少元件方案。",
+    math: "Γ(f) = [Zin(f)-Z0] / [Zin(f)+Z0]\nVSWR(f) = [1+|Γ(f)|] / [1-|Γ(f)|]\nScore = max_f VSWR(f)\nXL = 2πfL，XC = -1/(2πfC)",
   },
-
   {
-    title: "8. 驻波与回波损耗换算 (VSWR ↔ Return Loss)",
-    desc: "评估天线端口匹配程度的核心指标。VSWR 和 RL 是一一对应的。失配损耗代表因为端口阻抗不匹配而未进入天线的能量比例。",
-    math:
-      "Γ = (VSWR - 1) / (VSWR + 1) 或 10^(-RL / 20)\n\nRL (dB) = -20 * log10(Γ)\n\nMismatch Loss (dB) = -10 * log10(1 - Γ^2)\n\nTransmitted Power (%) = (1 - Γ^2) * 100",
+    title: "平衡 CRLH 单元初值",
+    desc: "同时令串联与并联谐振为 f0，得到平衡 CRLH 的一组等效初值；实际 ZOR 还取决于终端和色散关系。",
+    math: "ωse = 1/√(LR·CL) = 2πf0\nωsh = 1/√(LL·CR) = 2πf0\nCL = 1/(ω0²LR)，LL = 1/(ω0²CR)",
   },
-
   {
-    title: "9. 远场测试距离 (Fraunhofer Distance)",
-    desc: "进入 OTA 暗室测试前必须满足的最小距离条件。只有测试探头距离大于 R 时，辐射球面波才可以近似等效为平面波。",
-    math: "R = (2 * D^2) / λ\n\n其中 D 为天线最大物理轮廓尺寸，λ 为空间波长，单位统一为米。",
+    title: "单根圆柱过孔自感粗估",
+    desc: "只估计孤立圆柱导体的部分自感；实际环路电感强烈依赖回流路径、焊盘和并联地过孔。",
+    math: "L(nH) ≈ 0.2h[ln(4h/d)+1]\nh、d 使用 mm",
   },
-
   {
-    title: "12. 零阶谐振器参数综合 (ZOR CRLH)",
-    desc: "ZOR 天线在零阶模式（β=0）时的工作频率由等效分布参数L和C决定，不受物理波长限制。输入目标频率，反求出左手(LH)并联电感和左手串联电容值。",
-    math: "并联(ε-zero): f0 = 1 / [2π * √(LL * CR)]\n串联(μ-zero): f0 = 1 / [2π * √(LR * CL)]\n\n短截线/过孔预估引脚电感:\nL (nH) ≈ 0.2 * h * [ln(4h / d) + 1]  (h与d单位为mm)",
+    title: "微带线准静态近似",
+    desc: "此处忽略铜厚、粗糙度、阻焊、损耗和频散；W/h 较宽与较窄时使用对应的 Hammerstad/Wheeler 形式。",
+    math: "W/h ≤ 1:\nεeff = (εr+1)/2 + (εr-1)/2[1/√(1+12h/W)+0.04(1-W/h)²]\nZ0 = 60/√εeff · ln(8h/W + W/4h)\n\nW/h > 1:\nεeff = (εr+1)/2 + (εr-1)/(2√(1+12h/W))\nZ0 = 120π/{√εeff[W/h+1.393+0.667ln(W/h+1.444)]}",
   },
-
   {
-    title: "13. 微带线特征阻抗综合 (Microstrip)",
-    desc: "使用经典的 Wheeler/Hammerstad 公式估算顶层微带线的 Z0。通常 1.6mm 的 FR4 产生 50 欧姆特征阻抗所需的线宽约在 3.0 ~ 3.1 毫米。",
-    math: "W/h ≤ 1:\nε_eff = (ε_r+1)/2 + (ε_r-1)/2 * [1/√(1 + 12h/W) + 0.04(1 - W/h)^2]\nZ0 = 60 / √ε_eff * ln(8h/W + W/4h)\n\nW/h > 1:\nε_eff = (ε_r+1)/2 + (ε_r-1)/2 * 1/√(1 + 12h/W)\nZ0 = 120π / [√ε_eff * (W/h + 1.393 + 0.667*ln(W/h + 1.444))]",
+    title: "单谐振阻抗带宽等效 Q",
+    desc: "适用于调谐、窄带、单端口单谐振近似；多谐振、强损耗或宽带结构会偏离该关系。S=2 时 S11≈-9.54 dB、RL≈+9.54 dB。",
+    math: "FBW = Δf/fc\nQ ≈ (S-1)/(√S · FBW)",
   },
-
   {
-    title: "14. 品质因数与物理带宽 (Q Factor & FBW)",
-    desc: "评估一个谐振式小型化天线的性能极限（Q值越小，频带越宽）。",
-    math: "分数带宽 FBW = Δf / fc\n\n对于给定的目标驻波比门限 S (例如 S=2 代表 -9.54 dB):\n品质因数 Q ≈ [ (S - 1) / √S ] / FBW",
+    title: "3D 双极化总增益与球面积分",
+    desc: "H/V 两个正交极化在功率域相加；球面平均需用 sinθ 作为立体角权重。",
+    math: "Gtotal(dB) = 10log10[10^(GH/10)+10^(GV/10)]\nGavg = Σ[Glinear·sinθ·dθ·dφ] / Σ[sinθ·dθ·dφ]\nη = Gavg，D(dBi) = Gpeak(dBi)-10log10(Gavg)",
   },
 ];
 
 const bandData = window.BAND_DATA || {};
+const RF_CALC = window.RFCalculations || null;
+const MATCH_ENGINE = window.MatchingEngine || null;
 
 const $ = (id) => document.getElementById(id);
 
-function normalizeBandKey(value) {
-  let band = value.trim().toLowerCase().replace(/\s+/g, "");
-  if (band.startsWith("band")) {
-    band = band.slice(4);
-  } else if (band.startsWith("nr")) {
-    band = `n${band.slice(2)}`;
-  } else if (/^b\d+$/.test(band)) {
-    band = band.slice(1);
+function parseBandQuery(value) {
+  const input = value.trim().toLowerCase().replace(/\s+/g, "");
+  let match;
+
+  if ((match = input.match(/^(?:b|lte(?:band)?)(\d+)$/))) {
+    return { mode: "lte", number: String(parseInt(match[1], 10)) };
   }
-  return band;
+
+  if ((match = input.match(/^(?:n|nr(?:band)?)(\d+)$/))) {
+    return { mode: "nr", number: String(parseInt(match[1], 10)) };
+  }
+
+  if ((match = input.match(/^(?:band)?(\d+)$/))) {
+    return { mode: "auto", number: String(parseInt(match[1], 10)) };
+  }
+
+  return null;
+}
+
+function resolveBandQuery(value, data = bandData) {
+  const query = parseBandQuery(value);
+  if (!query) {
+    return { query: null, matches: [] };
+  }
+
+  const matches = [];
+  const lte = data[query.number];
+  const nr = data[`n${query.number}`];
+
+  if ((query.mode === "lte" || query.mode === "auto") && lte) {
+    matches.push({ label: `LTE B${query.number}`, value: lte });
+  }
+
+  if ((query.mode === "nr" || query.mode === "auto") && nr) {
+    matches.push({ label: `NR n${query.number}`, value: nr });
+  }
+
+  return { query, matches };
 }
 
 function isFiniteNumber(value) {
@@ -115,10 +128,22 @@ function setOutputs(ids, value = "---") {
 }
 
 function formatFixed(value, digits = 2) {
+  if (value === Infinity) {
+    return "∞";
+  }
+  if (value === -Infinity) {
+    return "−∞";
+  }
   return isFiniteNumber(value) ? value.toFixed(digits) : "---";
 }
 
 function formatSmart(value, digits = 4) {
+  if (value === Infinity) {
+    return "∞";
+  }
+  if (value === -Infinity) {
+    return "−∞";
+  }
   if (!isFiniteNumber(value)) {
     return "---";
   }
@@ -127,9 +152,64 @@ function formatSmart(value, digits = 4) {
 
 function wireSelectAll() {
   document.querySelectorAll(".calc-input").forEach((input) => {
+    if (input.tagName !== "INPUT") {
+      return;
+    }
+    if (!["bandInput", "arrayGains"].includes(input.id)) {
+      input.inputMode = "decimal";
+    }
     input.addEventListener("focus", () => input.select());
-    input.addEventListener("mouseup", (event) => event.preventDefault());
   });
+}
+
+function clearInputErrors(ids) {
+  ids.forEach((id) => {
+    const input = $(id);
+    if (!input) return;
+    input.removeAttribute("aria-invalid");
+    input.removeAttribute("title");
+  });
+}
+
+function markInputErrors(ids, message) {
+  ids.forEach((id) => {
+    const input = $(id);
+    if (!input) return;
+    input.setAttribute("aria-invalid", "true");
+    input.title = message;
+  });
+}
+
+function setCardMessage(anchorId, message = "", state = "error") {
+  const anchor = $(anchorId);
+  const card = anchor && anchor.closest(".tool-card");
+  if (!card) return;
+
+  let status = card.querySelector(".calc-status");
+  if (!status) {
+    status = document.createElement("p");
+    status.className = "calc-status";
+    status.setAttribute("role", "status");
+    card.append(status);
+  }
+
+  status.textContent = message;
+  status.dataset.state = state;
+  status.hidden = !message;
+}
+
+function reportCalculationError(anchorId, inputIds, outputIds, error) {
+  const message = error && error.message ? error.message : "输入数据无效。";
+  markInputErrors(inputIds, message);
+  setOutputs(outputIds, "输入有误");
+  setCardMessage(anchorId, message, "error");
+}
+
+function requireCalculationLibrary() {
+  if (!RF_CALC) {
+    throw new Error("计算模块未加载，请确认 rf-calculations.js 已部署。");
+  }
+  return RF_CALC;
 }
 
 function renderFormulas() {
@@ -210,120 +290,197 @@ function renderLinks() {
 }
 
 function setupTabs() {
-  const buttons = document.querySelectorAll(".tab-button");
+  const buttons = Array.from(document.querySelectorAll(".tab-button"));
   const panels = document.querySelectorAll(".content-panel");
 
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const target = button.dataset.tabTarget;
-      buttons.forEach((item) => item.classList.toggle("is-active", item === button));
-      panels.forEach((panel) => {
-        const active = panel.id === target;
-        panel.hidden = !active;
-        panel.classList.toggle("is-active", active);
-      });
+  const activate = (button, shouldFocus = false) => {
+    const target = button.dataset.tabTarget;
+    buttons.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle("is-active", active);
+      item.setAttribute("aria-selected", String(active));
+      item.tabIndex = active ? 0 : -1;
+    });
+    panels.forEach((panel) => {
+      const active = panel.id === target;
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    });
+    if (shouldFocus) {
+      button.focus();
+    }
+  };
+
+  buttons.forEach((button, index) => {
+    button.addEventListener("click", () => activate(button));
+    button.addEventListener("keydown", (event) => {
+      let nextIndex = null;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIndex = (index + 1) % buttons.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIndex = (index - 1 + buttons.length) % buttons.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = buttons.length - 1;
+      }
+
+      if (nextIndex !== null) {
+        event.preventDefault();
+        activate(buttons[nextIndex], true);
+      }
     });
   });
 }
 
 function calcWavelength() {
-  const f = parseFloat($("freqInput").value);
-  if (f > 0) {
-    const wlMm = (300 / f) * 1000;
-    $("waveMm").value = formatFixed(wlMm, 2);
-    $("waveCm").value = formatFixed(wlMm / 10, 2);
-    $("halfWave").value = formatFixed(wlMm / 2, 2);
-    $("quarterWave").value = formatFixed(wlMm / 4, 2);
-    return;
+  const inputIds = ["freqInput"];
+  const outputIds = ["waveMm", "waveCm", "halfWave", "quarterWave"];
+  clearInputErrors(inputIds);
+  setCardMessage("freqInput");
+  try {
+    const result = requireCalculationLibrary().calculateWavelength(
+      $("freqInput").value,
+    );
+    $("waveMm").value = formatFixed(result.wavelengthMm, 3);
+    $("waveCm").value = formatFixed(result.wavelengthCm, 3);
+    $("halfWave").value = formatFixed(result.halfWaveMm, 3);
+    $("quarterWave").value = formatFixed(result.quarterWaveMm, 3);
+  } catch (error) {
+    reportCalculationError("freqInput", inputIds, outputIds, error);
   }
-  setOutputs(["waveMm", "waveCm", "halfWave", "quarterWave"]);
 }
 
 function queryBand() {
-  const raw = $("bandInput").value;
-  const band = normalizeBandKey(raw);
-  let result = "❌ 未找到该Band频段信息";
+  const { query, matches } = resolveBandQuery($("bandInput").value);
 
-  if (bandData[band]) {
-    result = bandData[band];
-  } else if (band.startsWith("n") && bandData[band.slice(1)]) {
-    result = bandData[band.slice(1)];
-  } else if (band && bandData[`n${band}`]) {
-    result = bandData[`n${band}`];
+  if (!query) {
+    $("bandResult").value = "❌ 输入格式无效";
+    return;
   }
 
-  $("bandResult").value = result;
+  if (!matches.length) {
+    const wanted =
+      query.mode === "lte"
+        ? `LTE B${query.number}`
+        : query.mode === "nr"
+          ? `NR n${query.number}`
+          : `Band ${query.number}`;
+    $("bandResult").value = `❌ 未找到 ${wanted}`;
+    return;
+  }
+
+  $("bandResult").value = matches
+    .map(({ label, value }) => `[${label}] ${value}`)
+    .join("\n");
 }
 
 function calcFspl() {
-  const d = parseFloat($("fsplDistance").value);
-  const f = parseFloat($("fsplFreq").value);
-  if (d > 0 && f > 0) {
-    const fspl = 20 * Math.log10(d) + 20 * Math.log10(f) - 27.55;
-    $("fsplResult").value = formatFixed(fspl, 2);
-    return;
+  const inputIds = ["fsplDistance", "fsplFreq"];
+  const outputIds = ["fsplResult"];
+  clearInputErrors(inputIds);
+  setCardMessage("fsplDistance");
+  try {
+    const result = requireCalculationLibrary().calculateFspl(
+      $("fsplDistance").value,
+      $("fsplFreq").value,
+    );
+    $("fsplResult").value = formatFixed(result.fsplDb, 3);
+  } catch (error) {
+    reportCalculationError("fsplDistance", inputIds, outputIds, error);
   }
-  setOutputs(["fsplResult"]);
 }
 
 function syncEfficiencyFromDb() {
-  const db = parseFloat($("effDbInput").value);
-  if (!isFiniteNumber(db)) {
-    $("effPctInput").value = "";
-    return;
+  const inputIds = ["effDbInput"];
+  clearInputErrors(["effDbInput", "effPctInput"]);
+  setCardMessage("effDbInput");
+  try {
+    const percent = requireCalculationLibrary().efficiencyDbToPercent(
+      $("effDbInput").value,
+    );
+    $("effPctInput").value = formatFixed(percent, 3);
+  } catch (error) {
+    $("effPctInput").value = "输入有误";
+    markInputErrors(inputIds, error.message);
+    setCardMessage("effDbInput", error.message, "error");
   }
-  const effPct = (10 ** (db / 10)) * 100;
-  $("effPctInput").value = formatFixed(effPct, 2);
 }
 
 function syncDbFromEfficiency() {
-  const effPct = parseFloat($("effPctInput").value);
-  if (!(effPct > 0)) {
-    $("effDbInput").value = "";
-    return;
+  const inputIds = ["effPctInput"];
+  clearInputErrors(["effDbInput", "effPctInput"]);
+  setCardMessage("effPctInput");
+  try {
+    const db = requireCalculationLibrary().efficiencyPercentToDb(
+      $("effPctInput").value,
+    );
+    $("effDbInput").value = formatFixed(db, 4);
+  } catch (error) {
+    $("effDbInput").value = "输入有误";
+    markInputErrors(inputIds, error.message);
+    setCardMessage("effPctInput", error.message, "error");
   }
-  const db = 10 * Math.log10(effPct / 100);
-  $("effDbInput").value = formatFixed(db, 4);
 }
 
 function syncGainLinFromDb() {
-  const db = parseFloat($("gainDbInput").value);
-  if (!isFiniteNumber(db)) {
-    $("gainLinInput").value = "";
-    return;
+  clearInputErrors(["gainDbInput", "gainLinInput"]);
+  setCardMessage("gainDbInput");
+  try {
+    const linear = requireCalculationLibrary().gainDbToLinear(
+      $("gainDbInput").value,
+    );
+    $("gainLinInput").value = formatSmart(linear, 6);
+  } catch (error) {
+    $("gainLinInput").value = "输入有误";
+    markInputErrors(["gainDbInput"], error.message);
+    setCardMessage("gainDbInput", error.message, "error");
   }
-  const lin = 10 ** (db / 10);
-  $("gainLinInput").value = formatFixed(lin, 3);
 }
 
 function syncDbFromGainLin() {
-  const lin = parseFloat($("gainLinInput").value);
-  if (!(lin > 0)) {
-    $("gainDbInput").value = "";
-    return;
+  clearInputErrors(["gainDbInput", "gainLinInput"]);
+  setCardMessage("gainLinInput");
+  try {
+    const db = requireCalculationLibrary().gainLinearToDb(
+      $("gainLinInput").value,
+    );
+    $("gainDbInput").value = formatFixed(db, 4);
+  } catch (error) {
+    $("gainDbInput").value = "输入有误";
+    markInputErrors(["gainLinInput"], error.message);
+    setCardMessage("gainLinInput", error.message, "error");
   }
-  const db = 10 * Math.log10(lin);
-  $("gainDbInput").value = formatFixed(db, 3);
 }
 
 function syncWattFromDbm() {
-  const dbm = parseFloat($("dbmInput").value);
-  if (!isFiniteNumber(dbm)) {
-    $("wattInput").value = "";
-    return;
+  clearInputErrors(["dbmInput", "wattInput"]);
+  setCardMessage("dbmInput");
+  try {
+    const watts = requireCalculationLibrary().dbmToWatts(
+      $("dbmInput").value,
+    );
+    $("wattInput").value = formatSmart(watts, 7);
+  } catch (error) {
+    $("wattInput").value = "输入有误";
+    markInputErrors(["dbmInput"], error.message);
+    setCardMessage("dbmInput", error.message, "error");
   }
-  const watt = 10 ** ((dbm - 30) / 10);
-  $("wattInput").value = formatSmart(watt, 4);
 }
 
 function syncDbmFromWatt() {
-  const watt = parseFloat($("wattInput").value);
-  if (!(watt > 0)) {
-    $("dbmInput").value = "";
-    return;
+  clearInputErrors(["dbmInput", "wattInput"]);
+  setCardMessage("wattInput");
+  try {
+    const dbm = requireCalculationLibrary().wattsToDbm(
+      $("wattInput").value,
+    );
+    $("dbmInput").value = formatFixed(dbm, 4);
+  } catch (error) {
+    $("dbmInput").value = "输入有误";
+    markInputErrors(["wattInput"], error.message);
+    setCardMessage("wattInput", error.message, "error");
   }
-  const dbm = 10 * Math.log10(watt) + 30;
-  $("dbmInput").value = formatFixed(dbm, 4);
 }
 
 function calcArrayGain() {
@@ -331,476 +488,727 @@ function calcArrayGain() {
     const gains = $("arrayGains")
       .value.replace(/，/g, ",")
       .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map(Number);
-
-    if (!gains.length || gains.some((item) => !isFiniteNumber(item))) {
-      throw new Error("Invalid gains");
+      .map((item) => item.trim());
+    if (gains.some((item) => !item)) {
+      throw new Error("各路增益之间不能有空项，请用逗号分隔完整数字。");
     }
 
-    const count = gains.length;
-    const uncorr = 10 * Math.log10(gains.reduce((sum, g) => sum + 10 ** (g / 10), 0) / count);
-    const corr =
-      20 *
-      Math.log10(
-        gains.reduce((sum, g) => sum + 10 ** (g / 20), 0) / Math.sqrt(count),
-      );
-
-    $("arrayUncorr").value = formatFixed(uncorr, 2);
-    $("arrayCorr").value = formatFixed(corr, 2);
-  } catch (_error) {
-    setOutputs(["arrayUncorr", "arrayCorr"]);
+    clearInputErrors(["arrayGains"]);
+    setCardMessage("arrayGains");
+    const result = requireCalculationLibrary().combineArrayGains(gains, {
+      normalization: "fixed-total",
+    });
+    $("arrayUncorr").value = formatFixed(result.uncorrelatedDbi, 3);
+    $("arrayCorr").value = formatFixed(result.coherentDbi, 3);
+  } catch (error) {
+    reportCalculationError(
+      "arrayGains",
+      ["arrayGains"],
+      ["arrayUncorr", "arrayCorr"],
+      error,
+    );
   }
 }
 
 function calcActivePassive() {
-  const gain = parseFloat($("gainInput").value);
-  const eff = parseFloat($("effInput").value);
-  const condPower = parseFloat($("condPower").value);
-  const condSens = parseFloat($("condSens").value);
-
-  if ([gain, eff, condPower, condSens].every(isFiniteNumber)) {
-    $("directivityOutput").value = formatFixed(gain - eff, 2);
-    $("eirpOutput").value = formatFixed(condPower + gain, 2);
-    $("trpOutput").value = formatFixed(condPower + eff, 2);
-    $("eisOutput").value = formatFixed(condSens - gain, 2);
-    $("tisOutput").value = formatFixed(condSens - eff, 2);
-    return;
-  }
-
-  setOutputs([
+  const allInputIds = ["gainInput", "effInput", "condPower", "condSens"];
+  const allOutputIds = [
     "directivityOutput",
     "eirpOutput",
     "trpOutput",
     "eisOutput",
     "tisOutput",
-  ]);
+  ];
+  const errors = [];
+  clearInputErrors(allInputIds);
+  setCardMessage("gainInput");
+  let library;
+  try {
+    library = requireCalculationLibrary();
+  } catch (error) {
+    reportCalculationError("gainInput", allInputIds, allOutputIds, error);
+    return;
+  }
+
+  const calculateOutput = (outputId, dependencyIds, calculation) => {
+    if (dependencyIds.some((id) => !$(id).value.trim())) {
+      $(outputId).value = "---";
+      return;
+    }
+    try {
+      $(outputId).value = formatFixed(calculation(), 3);
+    } catch (error) {
+      $(outputId).value = "输入有误";
+      markInputErrors(dependencyIds, error.message);
+      errors.push(error.message);
+    }
+  };
+
+  calculateOutput(
+    "directivityOutput",
+    ["gainInput", "effInput"],
+    () => library.calculateDirectivity($("gainInput").value, $("effInput").value),
+  );
+  calculateOutput(
+    "eirpOutput",
+    ["condPower", "gainInput"],
+    () => library.calculateEirp($("condPower").value, $("gainInput").value),
+  );
+  calculateOutput(
+    "trpOutput",
+    ["condPower", "effInput"],
+    () => library.calculateTrp($("condPower").value, $("effInput").value),
+  );
+  calculateOutput(
+    "eisOutput",
+    ["condSens", "gainInput"],
+    () => library.calculateEis($("condSens").value, $("gainInput").value),
+  );
+  calculateOutput(
+    "tisOutput",
+    ["condSens", "effInput"],
+    () => library.calculateTis($("condSens").value, $("effInput").value),
+  );
+
+  if (errors.length) {
+    setCardMessage("gainInput", [...new Set(errors)].join(" "), "error");
+  }
 }
 
-function fillVswrOutputs(gamma) {
-  const rl = gamma > 0 ? -20 * Math.log10(gamma) : 99.99;
-  const ml = -10 * Math.log10(1 - gamma ** 2);
-  $("gammaOutput").value = formatFixed(gamma, 3);
-  $("mlOutput").value = formatFixed(ml, 3);
-  $("transPctOutput").value = formatFixed((1 - gamma ** 2) * 100, 1);
-  $("rlInput").value = formatFixed(rl, 2);
+function fillMismatchOutputs(metrics, source) {
+  $("gammaOutput").value = formatFixed(metrics.reflectionCoefficient, 6);
+  $("mlOutput").value = formatFixed(metrics.mismatchLossDb, 4);
+  $("transPctOutput").value = formatFixed(metrics.acceptedPowerPercent, 3);
+  if (source !== "vswr") {
+    $("vswrInput").value = formatFixed(metrics.vswr, 4);
+  }
+  if (source !== "rl") {
+    $("rlInput").value = formatFixed(metrics.returnLossDb, 4);
+  }
 }
 
 function syncRlFromVswr() {
-  const vswr = parseFloat($("vswrInput").value);
-  if (!isFiniteNumber(vswr)) {
-    setOutputs(["gammaOutput", "mlOutput", "transPctOutput"]);
-    $("rlInput").value = "";
-    return;
+  const inputIds = ["vswrInput"];
+  clearInputErrors(["vswrInput", "rlInput"]);
+  setCardMessage("vswrInput");
+  try {
+    const metrics = requireCalculationLibrary().metricsFromVswr(
+      $("vswrInput").value,
+    );
+    fillMismatchOutputs(metrics, "vswr");
+  } catch (error) {
+    $("rlInput").value = "输入有误";
+    reportCalculationError(
+      "vswrInput",
+      inputIds,
+      ["gammaOutput", "mlOutput", "transPctOutput"],
+      error,
+    );
   }
-
-  if (vswr === 1) {
-    $("rlInput").value = "99.99";
-    $("gammaOutput").value = "0.000";
-    $("mlOutput").value = "0.000";
-    $("transPctOutput").value = "100.0";
-    return;
-  }
-
-  if (vswr > 1) {
-    const gamma = (vswr - 1) / (vswr + 1);
-    fillVswrOutputs(gamma);
-    return;
-  }
-
-  setOutputs(["gammaOutput", "mlOutput", "transPctOutput"]);
-  $("rlInput").value = "";
 }
 
 function syncVswrFromRl() {
-  const rlRaw = parseFloat($("rlInput").value);
-  const rl = Math.abs(rlRaw);
-
-  if (!(rl > 0)) {
-    setOutputs(["gammaOutput", "mlOutput", "transPctOutput"]);
-    $("vswrInput").value = "";
-    return;
+  const inputIds = ["rlInput"];
+  clearInputErrors(["vswrInput", "rlInput"]);
+  setCardMessage("rlInput");
+  try {
+    const metrics = requireCalculationLibrary().metricsFromReturnLoss(
+      $("rlInput").value,
+    );
+    fillMismatchOutputs(metrics, "rl");
+  } catch (error) {
+    $("vswrInput").value = "输入有误";
+    reportCalculationError(
+      "rlInput",
+      inputIds,
+      ["gammaOutput", "mlOutput", "transPctOutput"],
+      error,
+    );
   }
-
-  const gamma = 10 ** (-rl / 20);
-  const vswr = (1 + gamma) / (1 - gamma);
-  $("vswrInput").value = formatFixed(vswr, 2);
-  $("gammaOutput").value = formatFixed(gamma, 3);
-  $("mlOutput").value = formatFixed(-10 * Math.log10(1 - gamma ** 2), 3);
-  $("transPctOutput").value = formatFixed((1 - gamma ** 2) * 100, 1);
 }
 
 function calcFarField() {
-  const diameterMm = parseFloat($("ffDiameter").value);
-  const freq = parseFloat($("ffFreq").value);
-
-  if (diameterMm > 0 && freq > 0) {
-    const wavelengthM = 300 / freq;
-    const diameterM = diameterMm / 1000;
-    const distanceM = (2 * diameterM ** 2) / wavelengthM;
-    $("ffMeters").value = formatFixed(distanceM, 3);
-    $("ffMillimeters").value = formatFixed(distanceM * 1000, 1);
-    return;
+  const inputIds = ["ffDiameter", "ffFreq"];
+  const outputIds = ["ffMeters", "ffMillimeters"];
+  clearInputErrors(inputIds);
+  setCardMessage("ffDiameter");
+  try {
+    const result = requireCalculationLibrary().calculateFraunhoferDistance(
+      $("ffDiameter").value,
+      $("ffFreq").value,
+    );
+    $("ffMeters").value = formatFixed(result.distanceM, 4);
+    $("ffMillimeters").value = formatFixed(result.distanceMm, 2);
+    if (!result.isElectricallyLarge) {
+      setCardMessage(
+        "ffDiameter",
+        "D < λ：2D²/λ 仍可显示，但单一 Fraunhofer 判据可能不足，请结合探头、暗室和天线类型复核。",
+        "warning",
+      );
+    }
+  } catch (error) {
+    reportCalculationError("ffDiameter", inputIds, outputIds, error);
   }
-
-  setOutputs(["ffMeters", "ffMillimeters"]);
 }
 
 function calcZor() {
-  const f0 = parseFloat($("zorFreq").value);
-  const Cr = parseFloat($("zorCr").value);
-  const Lr = parseFloat($("zorLr").value);
-
-  if (f0 > 0 && Cr > 0 && Lr > 0) {
-    const f0Hz = f0 * 1e6;
-    const CrF = Cr * 1e-12;
-    const LrH = Lr * 1e-9;
-
-    const LlH = 1 / ((2 * Math.PI * f0Hz) ** 2 * CrF);
-    const ClF = 1 / ((2 * Math.PI * f0Hz) ** 2 * LrH);
-
-    $("zorReqLl").value = formatFixed(LlH * 1e9, 3);
-    $("zorReqCl").value = formatFixed(ClF * 1e12, 3);
-    return;
+  const inputIds = ["zorFreq", "zorCr", "zorLr"];
+  const outputIds = ["zorReqLl", "zorReqCl"];
+  clearInputErrors(inputIds);
+  setCardMessage("zorFreq");
+  try {
+    const result = requireCalculationLibrary().synthesizeBalancedCrlh(
+      $("zorFreq").value,
+      $("zorCr").value,
+      $("zorLr").value,
+    );
+    $("zorReqLl").value = formatFixed(
+      result.requiredShuntInductanceNh,
+      4,
+    );
+    $("zorReqCl").value = formatFixed(
+      result.requiredSeriesCapacitancePf,
+      4,
+    );
+  } catch (error) {
+    reportCalculationError("zorFreq", inputIds, outputIds, error);
   }
-  setOutputs(["zorReqLl", "zorReqCl"]);
 }
 
 function calcViaInductance() {
-  const h = parseFloat($("viaHeight").value);
-  const d = parseFloat($("viaDiam").value);
-
-  if (h > 0 && d > 0) {
-    const L = 0.2 * h * (Math.log((4 * h) / d) + 1);
-    $("viaEstInd").value = formatFixed(L, 3);
-    return;
+  const inputIds = ["viaHeight", "viaDiam"];
+  const outputIds = ["viaEstInd"];
+  clearInputErrors(inputIds);
+  setCardMessage("viaHeight");
+  try {
+    const result = requireCalculationLibrary().estimateViaInductance(
+      $("viaHeight").value,
+      $("viaDiam").value,
+    );
+    $("viaEstInd").value = formatFixed(result.inductanceNh, 4);
+  } catch (error) {
+    reportCalculationError("viaHeight", inputIds, outputIds, error);
   }
-  setOutputs(["viaEstInd"]);
 }
 
 function calcMsZ0(er, h, w) {
-  const r = w / h;
-  let eeff = 0;
-  let z0 = 0;
-  if (r <= 1) {
-    eeff = (er + 1) / 2 + ((er - 1) / 2) * (1 / Math.sqrt(1 + 12 / r) + 0.04 * (1 - r) ** 2);
-    z0 = (60 / Math.sqrt(eeff)) * Math.log(8 / r + r / 4);
-  } else {
-    eeff = (er + 1) / 2 + ((er - 1) / 2) * (1 / Math.sqrt(1 + 12 / r));
-    z0 = (120 * Math.PI) / (Math.sqrt(eeff) * (r + 1.393 + 0.667 * Math.log(r + 1.444)));
-  }
-  return { z0, eeff };
+  const result = requireCalculationLibrary().calculateMicrostrip(er, h, w);
+  return {
+    z0: result.impedanceOhms,
+    eeff: result.effectivePermittivity,
+  };
 }
 
 function calcMicrostrip() {
-  const er = parseFloat($("msEr").value);
-  const h = parseFloat($("msH").value);
-  const w = parseFloat($("msW").value);
-  const targetZ0 = parseFloat($("msTargetZ0").value);
-
-  if (er > 0 && h > 0) {
-    if (w > 0) {
-      const res = calcMsZ0(er, h, w);
-      $("msZ0Result").value = formatFixed(res.z0, 2);
-      $("msEeffResult").value = formatFixed(res.eeff, 3);
-    } else {
-      setOutputs(["msZ0Result", "msEeffResult"]);
-    }
-    
-    if (targetZ0 > 0) {
-      let low = 0.001;
-      let high = 100.0 * h; 
-      let bestW = 0;
-      for (let i = 0; i < 50; i++) {
-        const mid = (low + high) / 2;
-        const testZ0 = calcMsZ0(er, h, mid).z0;
-        if (testZ0 > targetZ0) low = mid;
-        else high = mid;
-        bestW = mid;
-      }
-      $("msWResult").value = formatFixed(bestW, 3);
-    } else {
-      setOutputs(["msWResult"]);
-    }
+  const inputIds = ["msEr", "msH", "msW", "msTargetZ0"];
+  const errors = [];
+  clearInputErrors(inputIds);
+  setCardMessage("msEr");
+  let library;
+  try {
+    library = requireCalculationLibrary();
+  } catch (error) {
+    reportCalculationError(
+      "msEr",
+      inputIds,
+      ["msZ0Result", "msEeffResult", "msWResult"],
+      error,
+    );
     return;
   }
-  setOutputs(["msZ0Result", "msEeffResult", "msWResult"]);
-}
 
-function parseLcString(reactance, fHz) {
-  if (Math.abs(reactance) < 1e-9) return "短路 0Ω";
-  const w = 2 * Math.PI * fHz;
-  if (reactance > 0) {
-    const L = reactance / w; 
-    return `L = ${formatFixed(L * 1e9, 2)} nH`;
-  } else {
-    const C = -1 / (w * reactance);
-    return `C = ${formatFixed(C * 1e12, 2)} pF`;
+  try {
+    const analysis = library.calculateMicrostrip(
+      $("msEr").value,
+      $("msH").value,
+      $("msW").value,
+    );
+    $("msZ0Result").value = formatFixed(analysis.impedanceOhms, 4);
+    $("msEeffResult").value = formatFixed(
+      analysis.effectivePermittivity,
+      5,
+    );
+  } catch (error) {
+    setOutputs(["msZ0Result", "msEeffResult"], "输入有误");
+    markInputErrors(["msEr", "msH", "msW"], error.message);
+    errors.push(error.message);
+  }
+
+  try {
+    const synthesis = library.synthesizeMicrostrip(
+      $("msEr").value,
+      $("msH").value,
+      $("msTargetZ0").value,
+    );
+    $("msWResult").value = formatFixed(synthesis.traceWidthMm, 4);
+  } catch (error) {
+    $("msWResult").value = "输入有误";
+    markInputErrors(["msEr", "msH", "msTargetZ0"], error.message);
+    errors.push(error.message);
+  }
+
+  if (errors.length) {
+    setCardMessage("msEr", [...new Set(errors)].join(" "), "error");
   }
 }
-
-function parseLcStringP(susceptance, fHz) {
-  if (Math.abs(susceptance) < 1e-12) return "开路 0S";
-  const w = 2 * Math.PI * fHz;
-  if (susceptance > 0) {
-    const C = susceptance / w; 
-    return `C = ${formatFixed(C * 1e12, 2)} pF`;
-  } else {
-    const L = -1 / (w * susceptance);
-    return `L = ${formatFixed(L * 1e9, 2)} nH`;
-  }
-}
-
 
 function calcQFactor() {
-  const f = parseFloat($("qFreq").value);
-  const bw = parseFloat($("qBw").value);
-  const vswr = parseFloat($("qVswr").value);
-
-  if (f > 0 && bw > 0 && vswr > 1) {
-    const fbw = bw / f;
-    const q = ((vswr - 1) / Math.sqrt(vswr)) * (1 / fbw);
-    $("qFbwResult").value = formatFixed(fbw * 100, 2) + " %";
-    $("qResult").value = formatFixed(q, 2);
-    return;
+  const inputIds = ["qFreq", "qBw", "qVswr"];
+  const outputIds = ["qFbwResult", "qResult"];
+  clearInputErrors(inputIds);
+  setCardMessage("qFreq");
+  try {
+    const result = requireCalculationLibrary().estimateSingleResonanceQ(
+      $("qFreq").value,
+      $("qBw").value,
+      $("qVswr").value,
+    );
+    $("qFbwResult").value =
+      `${formatFixed(result.fractionalBandwidthPercent, 3)} %`;
+    $("qResult").value = formatFixed(result.equivalentQ, 4);
+    if (!result.isNarrowbandApproximation) {
+      setCardMessage(
+        "qFreq",
+        "FBW > 20%：该单谐振窄带关系可能产生较大偏差。",
+        "warning",
+      );
+    }
+  } catch (error) {
+    reportCalculationError("qFreq", inputIds, outputIds, error);
   }
-  setOutputs(["qFbwResult", "qResult"]);
 }
 
 const COMP_DATA = window.COMPONENTS_DATA || {};
-const STD_C = COMP_DATA.STD_C || [];
-const STD_L = COMP_DATA.STD_L || [];
+const TOUCHSTONE = window.TouchstoneS1P || null;
+const MAX_S1P_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_S1P_MATCH_POINTS = 61;
+const MAX_MATCH_VSWR_THRESHOLD = 100;
+let importedS1p = null;
+let s1pReadToken = 0;
+let smartMatchTaskId = 0;
 
-function getZComp(isL, val, fHz) {
-    if (val === 0) return { R: 0, X: 0 };
-    const w = 2 * Math.PI * fHz;
-    return isL ? { R: 0, X: w * val * 1e-9 } : { R: 0, X: -1 / (w * val * 1e-12) };
+function formatFrequencyMHz(fHz) {
+  return Number((fHz / 1e6).toPrecision(8)).toString();
 }
 
-function zAdd(a, b) { return { R: a.R + b.R, X: a.X + b.X }; }
-function zInv(a) { 
-    const mag2 = a.R*a.R + a.X*a.X; 
-    return { R: a.R/mag2, X: -a.X/mag2 }; 
-}
-function zPar(a, b) { 
-    if (a.R===0 && a.X===0) return {R:0, X:0};
-    if (b.R===0 && b.X===0) return {R:0, X:0};
-    return zInv(zAdd(zInv(a), zInv(b))); 
+function setMatchAlertText(message, state = "neutral") {
+  const alert = $("smAlertBox");
+  alert.textContent = message;
+  alert.dataset.state = state;
 }
 
-function calcVSWR(zin, z0 = 50.0) {
-    const r1 = zin.R - z0, x1 = zin.X;
-    const r2 = zin.R + z0, x2 = zin.X;
-    const magGamma = Math.sqrt((r1*r1 + x1*x1) / (r2*r2 + x2*x2));
-    if (magGamma >= 0.999) return 999;
-    return (1 + magGamma) / (1 - magGamma);
+function setS1pStatus(message, state = "neutral") {
+  const status = $("smS1pStatus");
+  status.textContent = message;
+  status.className = "s1p-status";
+  if (state === "success") {
+    status.classList.add("is-success");
+  } else if (state === "error") {
+    status.classList.add("is-error");
+  }
+}
+
+function getSmartMatchMode() {
+  const selected = document.querySelector('input[name="smInputMode"]:checked');
+  return selected ? selected.value : "manual";
+}
+
+function getComponentProfile() {
+  const profiles = COMP_DATA.profiles || {};
+  const requestedId = $("smComponentProfile").value;
+  const fallbackId = COMP_DATA.defaultProfile || "mixed";
+  const profile = profiles[requestedId] || profiles[fallbackId];
+  if (!profile) {
+    throw new Error("没有找到可用的村田参考物料配置，请检查 components-data.js。");
+  }
+  return profile;
+}
+
+function syncSmartMatchMode() {
+  smartMatchTaskId += 1;
+  const mode = getSmartMatchMode();
+  $("smManualPanel").hidden = mode !== "manual";
+  $("smS1pPanel").hidden = mode !== "s1p";
+  document.querySelectorAll(".match-mode-option").forEach((option) => {
+    const radio = option.querySelector('input[name="smInputMode"]');
+    option.classList.toggle("is-active", Boolean(radio && radio.checked));
+  });
+  $("smResultsList").replaceChildren();
+  setMatchAlertText(
+    mode === "manual"
+      ? "手动模式：请输入 1–3 组完整的频率、R、X。"
+      : "S1P 模式：请选择天线或负载的一端口 Touchstone 文件。",
+  );
+}
+
+function handleS1pFile(event) {
+  const readToken = ++s1pReadToken;
+  const file = event.target.files && event.target.files[0];
+  importedS1p = null;
+
+  if (!file) {
+    setS1pStatus("尚未选择文件。");
+    return;
+  }
+  if (!TOUCHSTONE) {
+    setS1pStatus("S1P 解析模块未加载，请确认 s1p-parser.js 已部署。", "error");
+    return;
+  }
+  if (!/\.s1p$/i.test(file.name)) {
+    setS1pStatus("请选择扩展名为 .s1p 的一端口文件。", "error");
+    return;
+  }
+  if (file.size > MAX_S1P_FILE_BYTES) {
+    setS1pStatus("文件超过 5 MiB，请缩小扫频数据后再导入。", "error");
+    return;
+  }
+
+  setS1pStatus("正在本机读取并解析文件…");
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (readToken !== s1pReadToken) return;
+    try {
+      const parsed = TOUCHSTONE.parseTouchstoneS1p(String(reader.result || ""));
+      importedS1p = { fileName: file.name, parsed };
+      const first = parsed.points[0];
+      const last = parsed.points[parsed.points.length - 1];
+      const warningText = parsed.warnings.length
+        ? "；提示：" + parsed.warnings.join("；")
+        : "";
+      setS1pStatus(
+        "已读取 " + file.name + "：" + parsed.points.length + " 点，" +
+          formatFrequencyMHz(first.frequencyHz) + "–" +
+          formatFrequencyMHz(last.frequencyHz) + " MHz，" +
+          parsed.metadata.format + "，文件参考 R " +
+          parsed.metadata.referenceOhms + " Ω" + warningText,
+        "success",
+      );
+    } catch (error) {
+      importedS1p = null;
+      setS1pStatus(error.message || "S1P 解析失败。", "error");
+    }
+  };
+  reader.onerror = () => {
+    if (readToken !== s1pReadToken) return;
+    importedS1p = null;
+    setS1pStatus("浏览器无法读取该文件，请重新选择。", "error");
+  };
+  reader.readAsText(file);
+}
+
+function strictUiNumber(text, label) {
+  return requireCalculationLibrary().parseStrictNumber(text, label);
+}
+
+function positiveFrequencyHz(text, label) {
+  const frequencyMHz = strictUiNumber(text, label);
+  const frequencyHz = frequencyMHz * 1e6;
+  if (!(frequencyMHz > 0) || !Number.isFinite(frequencyHz)) {
+    throw new Error(label + "必须是换算后仍有限且大于 0 的 MHz 数值。");
+  }
+  return frequencyHz;
+}
+
+function collectManualMatchingPoints() {
+  const points = [];
+  for (let index = 1; index <= 3; index += 1) {
+    const frequencyText = $("smF" + index).value.trim();
+    const resistanceText = $("smR" + index).value.trim();
+    const reactanceText = $("smX" + index).value.trim();
+    const filled = [frequencyText, resistanceText, reactanceText].filter(Boolean);
+
+    if (!filled.length) continue;
+    if (filled.length !== 3) {
+      throw new Error("手动输入第 " + index + " 行不完整，频率、R、X 需要同时填写。");
+    }
+
+    const fHz = positiveFrequencyHz(frequencyText, "第 " + index + " 行频率");
+    const resistance = strictUiNumber(resistanceText, "第 " + index + " 行 R");
+    const reactance = strictUiNumber(reactanceText, "第 " + index + " 行 X");
+    if (!(resistance > 0)) {
+      throw new Error("手动输入第 " + index + " 行的 R 必须大于 0 Ω。");
+    }
+    points.push({ fHz, Z: { R: resistance, X: reactance } });
+  }
+
+  if (!points.length) {
+    throw new Error("请至少填写一组完整的手动阻抗数据。");
+  }
+  points.sort((left, right) => left.fHz - right.fHz);
+  return {
+    points,
+    meta: {
+      mode: "manual",
+      sourceLabel: "手动 R+jX",
+      inRangeCount: points.length,
+      usableCount: points.length,
+      skippedCount: 0,
+      referenceOhms: null,
+    },
+  };
+}
+
+function readOptionalFrequencyMHz(id, fallback, label) {
+  const textValue = $(id).value.trim();
+  return textValue ? positiveFrequencyHz(textValue, label) : fallback;
+}
+
+function collectS1pMatchingPoints() {
+  if (!TOUCHSTONE) {
+    throw new Error("S1P 解析模块未加载，请确认部署了 s1p-parser.js。");
+  }
+  if (!importedS1p) {
+    throw new Error("请先选择并成功解析一个 .s1p 文件。");
+  }
+
+  const sourcePoints = importedS1p.parsed.points;
+  const sourceMinHz = sourcePoints[0].frequencyHz;
+  const sourceMaxHz = sourcePoints[sourcePoints.length - 1].frequencyHz;
+  const minHz = readOptionalFrequencyMHz("smS1pMinFreq", sourceMinHz, "分析起点");
+  const maxHz = readOptionalFrequencyMHz("smS1pMaxFreq", sourceMaxHz, "分析终点");
+  if (minHz > maxHz) {
+    throw new Error("分析起点不能高于分析终点。");
+  }
+
+  const inRange = TOUCHSTONE.filterPointsByFrequency(sourcePoints, minHz, maxHz);
+  if (!inRange.length) {
+    throw new Error("所选频率范围内没有 S1P 数据点。");
+  }
+
+  const usable = TOUCHSTONE.toMatcherPoints(inRange);
+  if (!usable.length) {
+    throw new Error("所选范围内没有正实部且有限的负载阻抗点。");
+  }
+
+  return {
+    points: usable,
+    meta: {
+      mode: "s1p",
+      sourceLabel: importedS1p.fileName,
+      inRangeCount: inRange.length,
+      usableCount: usable.length,
+      skippedCount: inRange.length - usable.length,
+      minHz: usable[0].fHz,
+      maxHz: usable[usable.length - 1].fHz,
+      referenceOhms: importedS1p.parsed.metadata.referenceOhms,
+    },
+  };
+}
+
+function formatVswr(value) {
+  return value === Infinity ? "∞" : formatFixed(value, 3);
+}
+
+function tierName(tier) {
+  const names = {
+    baseline: "无需匹配",
+    single: "单元件",
+    l: "L 型",
+    pi: "C-L-C Π 型",
+  };
+  return names[tier] || tier;
+}
+
+function appendMatchBadge(container, textValue, kind) {
+  const badge = document.createElement("span");
+  badge.className = "match-badge match-badge-" + kind;
+  badge.textContent = textValue;
+  container.append(badge);
+}
+
+function renderCandidateCard(candidate, result, profile, index) {
+  const card = document.createElement("article");
+  card.className = "match-result-card";
+  if (candidate.id === result.selected.id) {
+    card.classList.add("is-selected");
+  }
+
+  const header = document.createElement("div");
+  header.className = "match-result-head";
+  const title = document.createElement("strong");
+  title.textContent =
+    "#" + (index + 1) + " " + candidate.label +
+    (candidate.id === result.selected.id ? "（当前选择）" : "");
+  const score = document.createElement("span");
+  score.textContent = "Max VSWR " + formatVswr(candidate.maxVswr);
+  header.append(title, score);
+
+  const badges = document.createElement("div");
+  badges.className = "match-badges";
+  appendMatchBadge(
+    badges,
+    candidate.maxVswr <= result.vswrThreshold ? "达到门限" : "未达门限",
+    candidate.maxVswr <= result.vswrThreshold ? "success" : "warning",
+  );
+  appendMatchBadge(badges, candidate.componentCount + " 个 L/C 器件", "info");
+  appendMatchBadge(badges, tierName(candidate.tier), "neutral");
+
+  const comparison = document.createElement("p");
+  comparison.className = "match-result-comparison";
+  const delta = result.baseline.maxVswr - candidate.maxVswr;
+  comparison.textContent =
+    "匹配前 " + formatVswr(result.baseline.maxVswr) +
+    " → 匹配后 " + formatVswr(candidate.maxVswr) +
+    "；最差频点 " + formatFrequencyMHz(candidate.worstFrequencyHz) +
+    " MHz" +
+    (delta > 0 ? "；改善 " + formatFixed(delta, 3) : "");
+
+  const direction = document.createElement("p");
+  direction.className = "match-direction";
+  direction.textContent = candidate.topology.text;
+
+  const slots = document.createElement("dl");
+  slots.className = "match-slot-list";
+  candidate.topology.slots.forEach((slot) => {
+    const term = document.createElement("dt");
+    term.textContent = slot.label;
+    const detail = document.createElement("dd");
+    detail.textContent = slot.placement.display;
+    slots.append(term, detail);
+  });
+
+  const reference = document.createElement("p");
+  reference.className = "match-part-reference";
+  reference.textContent =
+    "村田参考：" + profile.packageEia + " / " +
+    profile.capacitorSeriesHint + " / " + profile.inductorSeriesHint +
+    "。具体料号、Q/SRF 和容差需按频点复核。";
+
+  card.append(header, badges, comparison, direction, slots, reference);
+  return card;
+}
+
+function formatTierComparison(result) {
+  const order = ["baseline", "single", "l", "pi"];
+  return order
+    .map((tier) => {
+      const best = result.tiers[tier].best;
+      return tierName(tier) + " " + (best ? formatVswr(best.maxVswr) : "无候选");
+    })
+    .join("｜");
+}
+
+function renderMatchingSynthesis(result, meta, profile) {
+  const selected = result.selected;
+  let headline;
+  let state;
+  if (result.selectionReason === "baseline-meets-threshold") {
+    headline = "✅ 匹配前已经达到门限，建议保持直通：串联位 0 Ω / 直通，并联位 DNP。";
+    state = "success";
+  } else if (result.passed) {
+    headline = "✅ 已找到达到门限的最低复杂度方案。";
+    state = "success";
+  } else if (result.selectionReason === "no-candidate-improves-baseline") {
+    headline = "⚠️ 当前物料表没有找到优于直通基准的方案，建议扩大物料值或回到天线本体调试。";
+    state = "warning";
+  } else {
+    headline = "⚠️ 当前最佳方案仍未达到门限，以下结果仅供继续调试。";
+    state = "warning";
+  }
+
+  const fileReference =
+    meta.referenceOhms === null
+      ? ""
+      : "；S1P 文件参考 R " + meta.referenceOhms + " Ω";
+  const skipped =
+    meta.skippedCount > 0 ? "；跳过 " + meta.skippedCount + " 个不可用点" : "";
+  const sampling =
+    result.usedSampling
+      ? "搜索抽样 " + result.counts.searchPointCount + " 点，最终全量复核 " +
+        result.counts.fullPointCount + " 点"
+      : "全部 " + result.counts.fullPointCount + " 点参与搜索和复核";
+
+  setMatchAlertText(
+    headline + "\n" +
+      "目标 Z0 " + result.targetZ0 + " Ω" + fileReference +
+      "；门限 VSWR " + result.vswrThreshold + "。\n" +
+      "匹配前 Max VSWR " + formatVswr(result.baseline.maxVswr) +
+      "；选择后 " + formatVswr(selected.maxVswr) +
+      "；最差频点 " + formatFrequencyMHz(selected.worstFrequencyHz) + " MHz。\n" +
+      sampling + skipped + "；候选约 " +
+      result.counts.estimatedCandidateCount + " 组。\n" +
+      "分层最佳：" + formatTierComparison(result) + "。\n" +
+      "理想 L/C 模型：未计入实际 Q、ESR/ESL、SRF、焊盘与过孔寄生。",
+    state,
+  );
+
+  const container = $("smResultsList");
+  container.replaceChildren();
+  result.recommendations.forEach((candidate, index) => {
+    container.append(renderCandidateCard(candidate, result, profile, index));
+  });
+}
+
+function runSmartMatch(input, threshold, targetZ0, profile) {
+  if (!MATCH_ENGINE) {
+    throw new Error("匹配引擎未加载，请确认 matching-engine.js 已部署。");
+  }
+  const result = MATCH_ENGINE.synthesizeMatching({
+    points: input.points,
+    capacitorsPf: profile.STD_C,
+    inductorsNh: profile.STD_L,
+    targetZ0,
+    vswrThreshold: threshold,
+    maxSearchPoints: MAX_S1P_MATCH_POINTS,
+    shortlistSize: 24,
+    resultLimit: 5,
+  });
+  renderMatchingSynthesis(result, input.meta, profile);
+  return result;
 }
 
 function processSmartMatch() {
-  const thresh = parseFloat($("smVswrTarget").value);
-  const pts = [];
-  for(let i=1; i<=3; i++) {
-      const f = parseFloat($(`smF${i}`).value) * 1e6;
-      const R = parseFloat($(`smR${i}`).value);
-      const X = parseFloat($(`smX${i}`).value);
-      if(f > 0 && R > 0 && isFiniteNumber(X)) pts.push({ fHz: f, Z: { R, X } });
+  let threshold;
+  let targetZ0;
+  let profile;
+  let input;
+
+  clearInputErrors(["smTargetZ0", "smVswrTarget"]);
+  try {
+    threshold = strictUiNumber($("smVswrTarget").value, "VSWR 门限");
+    targetZ0 = strictUiNumber($("smTargetZ0").value, "目标系统 Z0");
+    if (!(threshold > 1) || threshold > MAX_MATCH_VSWR_THRESHOLD) {
+      throw new Error("VSWR 门限必须大于 1 且不超过 " + MAX_MATCH_VSWR_THRESHOLD + "。");
+    }
+    if (!(targetZ0 > 0)) {
+      throw new Error("目标系统 Z0 必须大于 0 Ω。");
+    }
+    profile = getComponentProfile();
+    input =
+      getSmartMatchMode() === "s1p"
+        ? collectS1pMatchingPoints()
+        : collectManualMatchingPoints();
+  } catch (error) {
+    $("smResultsList").replaceChildren();
+    setMatchAlertText(error.message || "输入数据无效。", "error");
+    return;
   }
-  if (pts.length === 0 || !isFiniteNumber(thresh)) {
-      $("smResultsList").innerHTML = "";
-      return;
-  }
 
-  $("smAlertBox").innerHTML = "<em>正在推演组合，请稍候...</em>";
-  $("smAlertBox").style.background = "rgba(0,0,0,0.03)";
-  $("smAlertBox").style.color = "#555";
-  setTimeout(() => runSmartMatch(pts, thresh), 10);
-}
+  const button = $("btnSmartMatch");
+  const taskId = ++smartMatchTaskId;
+  button.disabled = true;
+  button.textContent = "正在计算…";
+  setMatchAlertText(
+    "正在用 " + input.points.length + " 个有效频点筛选 " +
+      profile.label + " 物料组合；最终会在全部有效点上复核…",
+  );
 
-function runSmartMatch(pts, thresh) {
-    let allL = [];
-    const comps = ["C", "L"];
-
-    // L-Net: Shunt Antenna -> Series Source
-    for (let sh of comps) {
-        let vals1 = sh === "C" ? STD_C : STD_L;
-        for (let v1 of vals1) {
-            for (let se of comps) {
-                let vals2 = se === "C" ? STD_C : STD_L;
-                for (let v2 of vals2) {
-                    let maxV = 0;
-                    let tempVswrs = [];
-                    for (let pt of pts) {
-                        let zsh = getZComp(sh === "L", v1, pt.fHz);
-                        let zse = getZComp(se === "L", v2, pt.fHz);
-                        let zIn = zAdd(zPar(pt.Z, zsh), zse);
-                        let v = calcVSWR(zIn);
-                        tempVswrs.push(v);
-                        maxV = Math.max(maxV, v);
-                    }
-                    // Keep networks that are somewhat reasonable
-                    if(maxV < 100) {
-                        allL.push({ maxV, vswrs: tempVswrs, top: "L型倒置: [并联] ➔ [串联] ➔ 接输入端",
-                                  c1: `${sh} = ${v1} ${sh==="L"?"nH":"pF"} (对地并联)`, 
-                                  c2: `${se} = ${v2} ${se==="L"?"nH":"pF"} (在线串联)`, c3: "---",
-                                  raw: { net: 'L1', comp1: sh, val1: v1, comp2: se, val2: v2 } });
-                    }
-                }
-            }
-        }
+  setTimeout(() => {
+    try {
+      if (taskId === smartMatchTaskId) {
+        runSmartMatch(input, threshold, targetZ0, profile);
+      }
+    } catch (error) {
+      if (taskId === smartMatchTaskId) {
+        setMatchAlertText("匹配计算失败：" + (error.message || "未知错误"), "error");
+      }
+    } finally {
+      if (taskId === smartMatchTaskId) {
+        button.disabled = false;
+        button.textContent = "运行阻抗匹配网络计算";
+      }
     }
-
-    // L-Net: Series Antenna -> Shunt Source
-    for (let se of comps) {
-        let vals1 = se === "C" ? STD_C : STD_L;
-        for (let v1 of vals1) {
-            for (let sh of comps) {
-                let vals2 = sh === "C" ? STD_C : STD_L;
-                for (let v2 of vals2) {
-                    let maxV = 0;
-                    let tempVswrs = [];
-                    for (let pt of pts) {
-                        let zse = getZComp(se === "L", v1, pt.fHz);
-                        let zsh = getZComp(sh === "L", v2, pt.fHz);
-                        let zIn = zPar(zAdd(pt.Z, zse), zsh);
-                        let v = calcVSWR(zIn);
-                        tempVswrs.push(v);
-                        maxV = Math.max(maxV, v);
-                    }
-                    if(maxV < 100) {
-                        allL.push({ maxV, vswrs: tempVswrs, top: "L型顺序: [串联] ➔ [并联] ➔ 接输入端",
-                                  c1: `${se} = ${v1} ${se==="L"?"nH":"pF"} (在线串联)`, 
-                                  c2: `${sh} = ${v2} ${sh==="L"?"nH":"pF"} (对地并联)`, c3: "---",
-                                  raw: { net: 'L2', comp1: se, val1: v1, comp2: sh, val2: v2 } });
-                    }
-                }
-            }
-        }
-    }
-
-    allL.sort((a, b) => a.maxV - b.maxV);
-    let topL = allL.slice(0, 5);
-    
-    // Check if the absolute best L-network passed the threshold
-    if (topL.length > 0 && topL[0].maxV <= thresh) {
-        let vswrStrL = pts.map((_, i) => `f${i+1}: ${formatFixed(topL[0].vswrs[i], 2)}`).join(" | ");
-        const titleMsg = `✅ L 型匹配网络满足要求<br/>最佳方案最大 VSWR = <strong style="color:#1e8e3e;font-size:16px;">${formatFixed(topL[0].maxV,2)}</strong><br/><span style="font-size:12px">各测算点 VSWR: [ ${vswrStrL} ]</span>`;
-        renderMatchResults(topL, titleMsg, "#e6f4ea", "#1e8e3e");
-        return;
-    }
-
-    // Pi-Network (3 elements) C-L-C Low Pass Fallback with strict limits > 0.3pF, > 0.3nH
-    let allPi = [];
-    for (let c1 of STD_C) {
-        if (c1 < 0.3) continue;
-        for (let l2 of STD_L) {
-            if (l2 < 0.3) continue;
-            for (let c3 of STD_C) {
-                if (c3 < 0.3) continue;
-                let maxV = 0;
-                let tempVswrs = [];
-                for (let pt of pts) {
-                    let zShunt1 = getZComp(false, c1, pt.fHz);
-                    let zSer = getZComp(true, l2, pt.fHz);
-                    let zShunt3 = getZComp(false, c3, pt.fHz);
-                    let zIn = zPar(zAdd(zPar(pt.Z, zShunt1), zSer), zShunt3);
-                    let v = calcVSWR(zIn);
-                    tempVswrs.push(v);
-                    maxV = Math.max(maxV, v);
-                }
-                if (maxV < 100) { // Keep networks that are somewhat reasonable
-                    allPi.push({ maxV, vswrs: tempVswrs, top: "Π 型经典低通宽频: (并联 ➔ 串联 ➔ 并联)",
-                              c1: `C1 = ${c1} pF (对地并联)`, c2: `L2 = ${l2} nH (在线串联)`, c3: `C3 = ${c3} pF (对地并联)`,
-                              raw: { net: 'Pi', comp1: 'C', val1: c1, comp2: 'L', val2: l2, comp3: 'C', val3: c3 } });
-                }
-            }
-        }
-    }
-
-    allPi.sort((a, b) => a.maxV - b.maxV);
-    let topPi = allPi.slice(0, 5);
-
-    let vswrStrPi = pts.map((_, i) => `f${i+1}: ${formatFixed(topPi[0].vswrs[i], 2)}`).join(" | ");
-    let msg = `⚠️ <strong>提示</strong>：L型网络最低能达到驻波 <span style="color:#d93025">${formatFixed(allL.length ? allL[0].maxV : 999, 2)}</span>，未满足门限。<br/>`;
-    msg += `<strong>切换至 Π 型匹配网络计算</strong>：带寄生限制自动筛选三元件组合。<br/>最大 VSWR = <strong style="color:#d93025;font-size:16px;">${formatFixed(topPi[0].maxV,2)}</strong> <br/><span style="font-size:12px;color:#d93025">各测算点 VSWR: [ ${vswrStrPi} ]</span>`;
-    renderMatchResults(topPi, msg, "#fce8e6", "#d93025");
-}
-
-function getRecommendationBadge(raw) {
-    if (!raw) return "";
-    let badges = [];
-    let lCount = 0;
-    
-    if (raw.net.startsWith('L')) {
-        badges.push('<span style="background:#e6f4ea; color:#1e8e3e; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">结构简单 (2元件)</span>');
-        if (raw.comp1 === 'L') lCount++;
-        if (raw.comp2 === 'L') lCount++;
-        
-        let isLowPass = false;
-        if (raw.net === 'L1' && raw.comp2 === 'L' && raw.comp1 === 'C') isLowPass = true;
-        if (raw.net === 'L2' && raw.comp1 === 'L' && raw.comp2 === 'C') isLowPass = true;
-        
-        if (isLowPass) {
-            badges.push('<span style="background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">👍 推荐 (低通滤波)</span>');
-        }
-    } else if (raw.net === 'Pi') {
-        badges.push('<span style="background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">低通滤波</span>');
-        lCount = 1;
-    }
-
-    if (lCount === 0) {
-        badges.push('<span style="background:#fce8e6; color:#d93025; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">🌟 极低损耗 (纯电容)</span>');
-    } else if (lCount >= 2) {
-        badges.push('<span style="background:#fef7e0; color:#e08400; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">⚠️ 损耗可能偏高 (多电感)</span>');
-    }
-
-    let hasExtreme = false;
-    let vals = [raw.val1, raw.val2];
-    if (raw.val3) vals.push(raw.val3);
-    for (let v of vals) {
-        if (v < 0.8) hasExtreme = true;
-    }
-    if (hasExtreme) {
-        badges.push('<span style="background:#fef7e0; color:#e08400; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:4px; margin-bottom:4px; display:inline-block;">⚠️ 元件值较小，易受寄生参数影响</span>');
-    }
-
-    return badges.join('');
-}
-
-function renderMatchResults(results, msgHtml, bgColor, txtColor) {
-    $("smAlertBox").innerHTML = msgHtml;
-    $("smAlertBox").style.background = bgColor;
-    
-    const container = $("smResultsList");
-    container.innerHTML = "";
-    
-    if(!results || results.length === 0) {
-        container.innerHTML = "<p>未能找到任何可用匹配组合。</p>";
-        return;
-    }
-    
-    results.forEach((res, index) => {
-        const c3Html = res.c3 !== "---" ? `<div>[3]: ${res.c3}</div>` : "";
-        const itemHtml = `
-          <div class="match-result-card" style="margin-bottom: 12px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff;">
-            <div style="font-weight: 700; color: ${txtColor}; margin-bottom: 8px; display: flex; justify-content: space-between;">
-              <span>#${index + 1} 推荐组合 (Max VSWR: ${formatFixed(res.maxV, 2)})</span>
-            </div>
-            <div style="margin-bottom: 8px;">
-              ${getRecommendationBadge(res.raw)}
-            </div>
-            <div style="font-size: 13px; color: var(--text-soft); margin-bottom: 6px;">
-              <strong>拓扑:</strong> ${res.top}
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 14px; background: var(--bg-2); padding: 8px; border-radius: 6px;">
-              <div>[1]: ${res.c1}</div>
-              <div>[2]: ${res.c2}</div>
-              ${c3Html}
-            </div>
-          </div>
-        `;
-        container.innerHTML += itemHtml;
-    });
+  }, 20);
 }
 
 function bindEvents() {
@@ -842,7 +1250,20 @@ function bindEvents() {
   $("msW").addEventListener("input", calcMicrostrip);
   $("msTargetZ0").addEventListener("input", calcMicrostrip);
 
-  // Progressive Matcher is click-based to avoid throttling the heavy Pi-net computation
+  document.querySelectorAll('input[name="smInputMode"]').forEach((radio) => {
+    radio.addEventListener("change", syncSmartMatchMode);
+  });
+  $("smS1pFile").addEventListener("change", handleS1pFile);
+  $("smComponentProfile").addEventListener("change", () => {
+    smartMatchTaskId += 1;
+    $("smResultsList").replaceChildren();
+    const profile = getComponentProfile();
+    setMatchAlertText(
+      "已切换为 " + profile.label + "；请重新运行匹配计算。",
+    );
+  });
+
+  // 匹配器保持点击触发，避免在输入过程中反复执行组合搜索。
   $("btnSmartMatch").addEventListener("click", processSmartMatch);
 
   $("qFreq").addEventListener("input", calcQFactor);
@@ -870,7 +1291,7 @@ function init() {
   calcZor();
   calcViaInductance();
   calcMicrostrip();
-  processSmartMatch();
+  syncSmartMatchMode();
   calcQFactor();
 }
 

@@ -9,7 +9,7 @@ window.LINKS_DATA = [
   { name: "RF Mentor", url: "https://rfmentor.com/", desc: "可视化拖拽式史密斯圆图匹配设计", tag: "匹配工具" },
 
   // ── 射频计算 ──
-  { name: "RF Cafe Calculator", url: "https://www.rfcafe.com/references/calculators.htm", desc: "RF Cafe 大量射频计算工具合集", tag: "计算工具" },
+  { name: "RF Cafe", url: "https://www.rfcafe.com/", desc: "RF Cafe 射频资料与计算工具入口", tag: "计算工具" },
   { name: "Microwaves101", url: "https://www.microwaves101.com/", desc: "微波工程百科全书，含大量教程和公式", tag: "学习资源" },
   { name: "Pasternack RF Calculator", url: "https://www.pasternack.com/t-calculator.aspx", desc: "Pasternack 提供的各类射频在线计算器", tag: "计算工具" },
 
@@ -38,6 +38,6 @@ window.LINKS_DATA = [
   { name: "Google Patents", url: "https://patents.google.com/", desc: "最易用的免费专利搜索引擎，支持全文检索和引用分析", tag: "专利检索" },
   { name: "Espacenet (EPO)", url: "https://worldwide.espacenet.com/", desc: "欧洲专利局官方检索，支持机器翻译非英文专利", tag: "专利检索" },
   { name: "WIPO PATENTSCOPE", url: "https://patentscope.wipo.int/", desc: "世界知识产权组织 PCT 国际专利申请检索", tag: "专利检索" },
-  { name: "USPTO Patent Search", url: "https://ppubs.uspto.gov/", desc: "美国专利商标局官方检索工具", tag: "专利检索" },
+  { name: "USPTO Patent Search", url: "https://ppubs.uspto.gov/basic/", desc: "美国专利商标局官方检索工具", tag: "专利检索" },
   { name: "中国专利公布公告", url: "https://epub.cnipa.gov.cn/", desc: "中国国家知识产权局专利检索与公布公告系统", tag: "专利检索" },
 ];
