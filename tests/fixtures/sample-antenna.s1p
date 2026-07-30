@@ -1,0 +1,7 @@
+! Browser regression fixture: passive one-port antenna/load data
+# MHz S RI R 50
+2400 -0.20 -0.20
+2425 -0.19 -0.18
+2450 -0.18 -0.15
+2475 -0.16 -0.12
+2500 -0.15 -0.10
