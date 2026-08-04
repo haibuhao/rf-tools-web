@@ -9,7 +9,7 @@
       content="纯前端的天线与射频工程计算工具，包含 Band、阻抗匹配、S1P、链路、微带线和 OTA 常用换算。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=20260730" />
+    <link rel="stylesheet" href="./styles.css?v=20260804" />
   </head>
   <body>
     <noscript>
@@ -554,6 +554,50 @@
                 </label>
               </div>
             </section>
+
+<section class="tool-card accent-blue wide" id="arrayPatternCard">
+              <div class="card-stripe"></div>
+              <div class="card-head">
+                <p class="card-kicker">Module 14</p>
+                <h2>线性天线阵列方向图</h2>
+                <p>浏览器本地计算均匀线阵扫频方向图，支持扫描角、功率加权、自定义相位以及半波振子/各向同性阵元；无需 Python 或服务器。</p>
+              </div>
+              <div class="array-pattern-layout">
+                <div class="cluster array-pattern-controls">
+                  <h3>阵列与扫频参数</h3>
+                  <div class="field-grid array-parameter-grid">
+                    <label class="field"><span>起始频率 (MHz)</span><input class="calc-input" id="apStartFreq" type="text" value="1695" /></label>
+                    <label class="field"><span>终止频率 (MHz)</span><input class="calc-input" id="apStopFreq" type="text" value="2690" /></label>
+                    <label class="field"><span>频率点数 (1–11)</span><input class="calc-input" id="apFreqPoints" type="text" value="3" /></label>
+                    <label class="field"><span>阵元数量 (1–64)</span><input class="calc-input" id="apNumElements" type="text" value="6" /></label>
+                    <label class="field"><span>阵元间距 (mm)</span><input class="calc-input" id="apSpacing" type="text" value="100" /></label>
+                    <label class="field"><span>扫描角 (deg)</span><input class="calc-input" id="apScanAngle" type="text" value="0" /></label>
+                    <label class="field field-wide">
+                      <span>阵元类型</span>
+                      <select class="calc-input" id="apElementType">
+                        <option value="half-wave-dipole">半波振子</option>
+                        <option value="isotropic">各向同性</option>
+                      </select>
+                    </label>
+                    <label class="field field-wide"><span>功率加权（每阵元一个值）</span><textarea class="calc-input array-list-input" id="apTaper" rows="2">1.0, 1.0, 1.0, 1.0, 1.0, 1.0</textarea></label>
+                    <label class="field field-wide"><span>相位分布 deg（每阵元一个值）</span><textarea class="calc-input array-list-input" id="apPhase" rows="2">0, 0, 0, 0, 0, 0</textarea></label>
+                  </div>
+                  <div class="array-action-row">
+                    <button class="secondary-action" type="button" id="btnArrayAutoPhase">按扫描角生成相位</button>
+                    <button class="primary-action" type="button" id="btnArrayPattern">运行方向图仿真</button>
+                  </div>
+                  <p class="array-model-note">功率加权会先开方转换为电压激励。方向性按理想旋转对称模型积分；未计入阵元互耦、馈电损耗、平台散射、幅相误差和有源阻抗。间距超过 0.5 λ 时需重点检查栅瓣。</p>
+                </div>
+                <div class="cluster array-pattern-output">
+                  <h3>归一化方向图</h3>
+                  <p class="array-pattern-status" id="arrayPatternStatus" role="status" aria-live="polite"></p>
+                  <div class="array-chart-frame">
+                    <svg id="arrayPatternChart"></svg>
+                  </div>
+                  <ul class="array-trace-results" id="arrayPatternResults" aria-label="各频点仿真结果"></ul>
+                </div>
+              </div>
+            </section>
           </div>
         </section>
 
@@ -579,7 +623,7 @@
       </main>
 
       <footer class="site-footer">
-        <p>Antenna Calculator · by <a href="https://www.gitloc.com" target="_blank" rel="noopener noreferrer">Zhihao</a> · v2026.07.30</p>
+        <p>Antenna Calculator · by <a href="https://www.gitloc.com" target="_blank" rel="noopener noreferrer">Zhihao</a> · v2026.08.04</p>
       </footer>
     </div>
 
@@ -589,6 +633,7 @@
     <script src="./s1p-parser.js?v=20260730"></script>
     <script src="./rf-calculations.js?v=20260730"></script>
     <script src="./matching-engine.js?v=20260730"></script>
-    <script src="./app.js?v=20260730"></script>
+    <script src="./antenna-array.js?v=20260804"></script>
+    <script src="./app.js?v=20260804"></script>
   </body>
 </html>

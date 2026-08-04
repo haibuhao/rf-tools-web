@@ -7,6 +7,7 @@
 - `index.html`：页面结构
 - `styles.css`：桌面与移动端样式
 - `app.js`：页面交互与结果渲染
+- `antenna-array.js`：线性阵列扫频、波束宽度、方向性计算与 SVG 方向图
 - `rf-calculations.js`：严格输入校验与 RF 纯计算函数
 - `matching-engine.js`：DNP / 单元件 / L / Π 型离散物料匹配引擎
 - `s1p-parser.js`：浏览器端 Touchstone 1.x/2.x S1P 解析器
@@ -84,7 +85,7 @@ node --test tests/*.test.js
 https://你的用户名.github.io/你的仓库名/
 ```
 
-发布时请在同一个 commit 中一起提交 `index.html`、`app.js`、`styles.css`、`rf-calculations.js`、`matching-engine.js`、`s1p-parser.js` 和三个数据脚本，避免 GitHub Pages/CDN 短时间混用新旧文件。页面资源带有版本查询参数，版本更新时可同步修改 `index.html` 中的 `v=YYYYMMDD`。
+发布时请在同一个 commit 中一起提交 `index.html`、`app.js`、`styles.css`、`antenna-array.js`、`rf-calculations.js`、`matching-engine.js`、`s1p-parser.js` 和三个数据脚本，避免 GitHub Pages/CDN 短时间混用新旧文件。页面资源带有版本查询参数，版本更新时可同步修改 `index.html` 中的 `v=YYYYMMDD`。
 
 ## 当前功能
 
@@ -100,6 +101,7 @@ https://你的用户名.github.io/你的仓库名/
 - 平衡 CRLH 单元初步综合与单根过孔自感粗估
 - 微带线特征阻抗正向估算与线宽反求
 - 单谐振阻抗带宽等效 Q 估算
+- 线性天线阵列扫频方向图（扫描角、功率加权、自定义相位、半波振子/各向同性阵元）
 - 射频公式与常用网站
 
 ## 模型边界

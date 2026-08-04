@@ -1293,6 +1293,9 @@ function init() {
   calcMicrostrip();
   syncSmartMatchMode();
   calcQFactor();
+  if (window.AntennaArrayTools) {
+    window.AntennaArrayTools.mount();
+  }
 }
 
 window.addEventListener("DOMContentLoaded", init);
